@@ -1,106 +1,51 @@
-function login(){
-  const user = username.value;
-  const pass = password.value;
-
-  if(!user || !pass){
-    alert("Lengkapi login!");
-    return;
-  }
-
-  const users = JSON.parse(localStorage.getItem("users")) || [];
-  const cek = users.find(u => u.username === user && u.password === pass);
-
-  if(!cek){
-    alert("Username atau password salah!");
-    return;
-  }
-
-  localStorage.setItem("user", cek.username);
-  location.href = "dashboard.html";
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("show");
 }
 
-
-/* DATA */
-const books=[
- {judul:"Pemrograman Web",kat:"Informatika",status:"Tersedia"},
- {judul:"Basis Data",kat:"Informatika",status:"Tersedia"},
- {judul:"Manajemen Proyek",kat:"Manajemen",status:"Dipinjam"},
- {judul:"Algoritma & Struktur Data",kat:"Informatika",status:"Tersedia"}
-];
-
-/* KATALOG */
-function loadKatalog(){
-  const q=(search?.value||"").toLowerCase();
-  tbody.innerHTML=books
-    .filter(b=>b.judul.toLowerCase().includes(q))
-    .map((b,i)=>`
-      <tr>
-        <td>${i+1}</td>
-        <td>${b.judul}</td>
-        <td>${b.kat}</td>
-        <td>${b.status}</td>
-      </tr>`).join("");
-}
-
-/* PINJAM */
-function pinjam(){
-  if(!nama.value||!nim.value||!buku.value||!tanggal.value){
-    alert("Lengkapi data");return;
-  }
-  const r=JSON.parse(localStorage.getItem("riwayat")||"[]");
-  r.push({nama:nama.value,nim:nim.value,buku:buku.value,tgl:tanggal.value});
-  localStorage.setItem("riwayat",JSON.stringify(r));
-  alert("Peminjaman tersimpan");
-  formPinjam.reset();
-}
-
-/* RIWAYAT */
-function loadRiwayat(){
-  const r=JSON.parse(localStorage.getItem("riwayat")||"[]");
-  tbody.innerHTML=r.map((d,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td>${d.nama}</td>
-      <td>${d.nim}</td>
-      <td>${d.buku}</td>
-      <td>${d.tgl}</td>
-    </tr>`).join("");
-}
-
-/* DENDA */
-function hitungDenda(){
-  hasil.innerText="Rp "+((hariTerlambat.value||0)*500);
-}
-
-/* REGISTER */
 function register(){
-  const nama = document.getElementById("regNama").value;
-  const nim = document.getElementById("regNim").value;
-  const user = document.getElementById("regUsername").value;
-  const pass = document.getElementById("regPassword").value;
+  const user={
+    nama:regNama.value,
+    nim:regNim.value,
+    username:regUsername.value,
+    password:regPassword.value
+  };
 
-  if(!nama || !nim || !user || !pass){
-    alert("Semua data wajib diisi!");
+  if(!user.nama||!user.nim||!user.username||!user.password){
+    alert("Lengkapi data");
     return;
   }
 
-  let users = JSON.parse(localStorage.getItem("users")) || [];
-
-  const cek = users.find(u => u.username === user);
-  if(cek){
-    alert("Username sudah terdaftar!");
+  let users=JSON.parse(localStorage.getItem("users"))||[];
+  if(users.find(u=>u.username===user.username)){
+    alert("Username sudah ada");
     return;
   }
 
-  users.push({
-    nama:nama,
-    nim:nim,
-    username:user,
-    password:pass
-  });
+  users.push(user);
+  localStorage.setItem("users",JSON.stringify(users));
+  alert("Pendaftaran berhasil");
+  location.href="index.html";
+}
 
-  localStorage.setItem("users", JSON.stringify(users));
+function login(){
+  const u=username.value;
+  const p=password.value;
+  const users=JSON.parse(localStorage.getItem("users"))||[];
 
-  alert("Pendaftaran berhasil! Silakan login.");
-  location.href = "index.html";
+  const ok=users.find(x=>x.username===u && x.password===p);
+  if(!ok){alert("Login gagal");return;}
+
+  localStorage.setItem("login","true");
+  location.href="dashboard.html";
+}
+
+function checkLogin(){
+  if(!localStorage.getItem("login")){
+    location.href="index.html";
+  }
+}
+
+function logout(){
+  localStorage.removeItem("login");
+  location.href="index.html";
 }

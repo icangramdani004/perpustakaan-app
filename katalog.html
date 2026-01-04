@@ -1,23 +1,58 @@
 <!DOCTYPE html>
-<html><head>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Katalog Buku</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body onload="checkLogin();loadKatalog()">
+<body onload="checkLogin()">
 
-<div class="navbar"><div class="container">
-<img src="assets/logo-mandala.jpg">
-<div class="menu"><a href="dashboard.html">Beranda</a><a href="#" onclick="logout()">Logout</a></div>
-</div></div>
-
-<div class="container">
-<h2>Katalog Buku</h2>
-<input id="search" onkeyup="loadKatalog()" placeholder="Cari judul buku">
-<table>
-<thead><tr><th>No</th><th>Judul</th><th>Kategori</th><th>Status</th></tr></thead>
-<tbody id="tbody"></tbody>
-</table>
+<div class="navbar">
+  <div class="nav-wrap">
+    <div class="brand">
+      <img src="assets/logo-mandala.jpg">
+      <span class="brand-title">Perpustakaan Digital</span>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="menu" id="menu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="katalog.html" class="active">Katalog</a>
+      <a href="pinjam.html">Peminjaman</a>
+      <a href="riwayat.html">Riwayat</a>
+      <a href="denda.html">Denda</a>
+      <a href="anggota.html">Anggota</a>
+      <a href="notifikasi.html">Notifikasi</a>
+      <a href="laporan.html">Laporan</a>
+      <a href="tentang.html">Tentang</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
 </div>
 
+<div class="container">
+  <div class="page-title">Katalog Buku</div>
+
+  <table>
+    <tr>
+      <th>No</th><th>Judul</th><th>Penulis</th><th>Status</th>
+    </tr>
+    <tr>
+      <td data-label="No">1</td>
+      <td data-label="Judul">Pemrograman Web</td>
+      <td data-label="Penulis">Budi</td>
+      <td data-label="Status">Tersedia</td>
+    </tr>
+    <tr>
+      <td data-label="No">2</td>
+      <td data-label="Judul">Basis Data</td>
+      <td data-label="Penulis">Badi</td>
+      <td data-label="Status">Dipinjam</td>
+    </tr>
+  </table>
+</div>
+
+<footer>© 2025 Perpustakaan Kampus</footer>
 <script src="script.js"></script>
-</body></html>
+</body>
+</html>

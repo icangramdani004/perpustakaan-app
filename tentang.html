@@ -1,22 +1,47 @@
 <!DOCTYPE html>
-<html><head>
-<title>Tentang Perpustakaan</title>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tentang</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body onload="checkLogin()">
 
-<div class="navbar"><div class="container">
-<img src="assets/logo-mandala.png">
-<div class="menu"><a href="dashboard.html">Beranda</a><a href="#" onclick="logout()">Logout</a></div>
-</div></div>
+<div class="navbar">
+  <div class="nav-wrap">
+    <div class="brand">
+      <img src="assets/logo-mandala.jpg">
+      <span class="brand-title">Perpustakaan Digital</span>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="menu" id="menu">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="katalog.html">Katalog</a>
+      <a href="pinjam.html">Peminjaman</a>
+      <a href="riwayat.html">Riwayat</a>
+      <a href="denda.html">Denda</a>
+      <a href="anggota.html">Anggota</a>
+      <a href="notifikasi.html">Notifikasi</a>
+      <a href="laporan.html">Laporan</a>
+      <a href="tentang.html" class="active">Tentang</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+</div>
 
 <div class="container">
-<h2>Tentang Perpustakaan</h2>
-<div class="card">
-<p>Perpustakaan Kampus Mandala berfungsi sebagai pusat sumber belajar yang mendukung kegiatan akademik.</p>
-<p>Sistem ini dikembangkan sebagai bagian dari tugas Rekayasa Perangkat Lunak.</p>
-</div>
+  <div class="page-title">Tentang Perpustakaan</div>
+  <div class="card">
+    <p>
+      Perpustakaan Digital Kampus merupakan sistem informasi yang
+      dirancang untuk mendukung kegiatan akademik melalui layanan
+      pengelolaan koleksi dan peminjaman buku secara terkomputerisasi.
+    </p>
+  </div>
 </div>
 
+<footer>© 2025 Perpustakaan Kampus</footer>
 <script src="script.js"></script>
-</body></html>
+</body>
+</html>

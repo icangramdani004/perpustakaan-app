@@ -1,38 +1,42 @@
 <!DOCTYPE html>
-<html><head>
+<html>
+<head>
 <meta charset="UTF-8">
-<title>Perpustakaan Digital</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
 <link rel="stylesheet" href="style.css">
-</head><body>
+</head>
+<body>
 
 <div class="navbar">
-  <div class="container nav-wrap">
+  <div class="nav-wrap">
     <div class="brand">
       <img src="assets/logo-mandala.jpg">
       <span class="brand-title">Perpustakaan Digital</span>
     </div>
+  </div>
+</div>
 
-    <div class="menu show">
-      <a href="#login">Login</a>
-      <a href="register.html">Daftar Akun</a>
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1>Perpustakaan Digital Kampus</h1>
+      <p>Sistem informasi perpustakaan untuk mendukung layanan akademik.</p>
+    </div>
+
+    <div class="auth-card">
+      <h2>Login</h2>
+      <input id="username" placeholder="Username">
+      <input id="password" type="password" placeholder="Password">
+      <button onclick="login()">Masuk</button>
+      <p style="margin-top:10px;text-align:center">
+        Belum punya akun? <a href="register.html">Daftar</a>
+      </p>
     </div>
   </div>
-</div>
-
-<div class="hero">
-  <h1>Perpustakaan Digital Kampus</h1>
-  <p>Sistem perpustakaan berbasis web untuk layanan akademik modern</p>
-</div>
-
-<div class="container" id="login">
-  <div class="form">
-    <h2>Login</h2>
-    <input id="username" placeholder="Username">
-    <input id="password" type="password" placeholder="Password">
-    <button onclick="login()">Masuk</button>
-  </div>
-</div>
+</section>
 
 <footer>© 2025 Perpustakaan Kampus</footer>
 <script src="script.js"></script>
-</body></html>
+</body>
+</html>

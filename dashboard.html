@@ -1,33 +1,36 @@
-<!DOCTYPE html>
-<html><head>
-<title>Dashboard</title>
-<link rel="stylesheet" href="style.css">
-</head>
 <body onload="checkLogin()">
-
-<div class="navbar"><div class="container">
-<img src="assets/logo-mandala.jpg">
-<div class="menu">
-<a href="dashboard.html">Beranda</a>
-<a href="katalog.html">Katalog</a>
-<a href="pinjam.html">Peminjaman</a>
-<a href="riwayat.html">Riwayat</a>
-<a href="denda.html">Denda</a>
-<a href="anggota.html">Keanggotaan</a>
-<a href="notifikasi.html">Notifikasi</a>
-<a href="laporan.html">Laporan</a>
-<a href="tentang.html">Tentang</a>
-<a href="#" onclick="logout()">Logout</a>
-</div></div></div>
+    <link rel="stylesheet" href="style.css">
+<div class="navbar">
+  <div class="nav-wrap">
+    <div class="brand">
+      <img src="assets/logo-mandala.jpg">
+      <span class="brand-title">Perpustakaan Digital</span>
+    </div>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div class="menu" id="menu">
+      <a href="dashboard.html" class="active">Dashboard</a>
+      <a href="katalog.html">Katalog</a>
+      <a href="pinjam.html">Peminjaman</a>
+      <a href="riwayat.html">Riwayat</a>
+      <a href="denda.html">Denda</a>
+      <a href="anggota.html">Anggota</a>
+      <a href="notifikasi.html">Notifikasi</a>
+      <a href="laporan.html">Laporan</a>
+      <a href="tentang.html">Tentang</a>
+      <a href="#" onclick="logout()">Logout</a>
+    </div>
+  </div>
+</div>
 
 <div class="container">
-<h2>Dashboard</h2>
-<div class="cards">
-<div class="card"><h3>Total Buku</h3><p>120</p></div>
-<div class="card"><h3>Buku Dipinjam</h3><p>35</p></div>
-<div class="card"><h3>Anggota Aktif</h3><p>80</p></div>
-</div>
+  <div class="page-title">Dashboard</div>
+  <div class="cards">
+    <div class="card">Total Buku<br><strong>120</strong></div>
+    <div class="card">Dipinjam<br><strong>35</strong></div>
+    <div class="card">Anggota<br><strong>80</strong></div>
+  </div>
 </div>
 
+<footer>© 2025 Perpustakaan Kampus</footer>
 <script src="script.js"></script>
-</body></html>
+</body>
