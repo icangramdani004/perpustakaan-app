@@ -2,7 +2,7 @@ function toggleMenu(){
   document.getElementById("menu").classList.toggle("show");
 }
 
-function register(){
+async function register(){
   const user={
     nama:regNama.value,
     nim:regNim.value,
@@ -15,28 +15,56 @@ function register(){
     return;
   }
 
-  let users=JSON.parse(localStorage.getItem("users"))||[];
-  if(users.find(u=>u.username===user.username)){
-    alert("Username sudah ada");
-    return;
-  }
+  try {
+    const response = await fetch('http://localhost:3000/api/user/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(user)
+    });
 
-  users.push(user);
-  localStorage.setItem("users",JSON.stringify(users));
-  alert("Pendaftaran berhasil");
-  location.href="index.html";
+    const data = await response.json();
+    
+    if (!response.ok) {
+      alert(data.error || "Registrasi gagal");
+      return;
+    }
+
+    alert("Pendaftaran berhasil!");
+    location.href="index.html";
+  } catch (error) {
+    console.error("Register error:", error);
+    alert("Error: " + error.message);
+  }
 }
 
-function login(){
+async function login(){
   const u=username.value;
   const p=password.value;
-  const users=JSON.parse(localStorage.getItem("users"))||[];
 
-  const ok=users.find(x=>x.username===u && x.password===p);
-  if(!ok){alert("Login gagal");return;}
+  try {
+    const response = await fetch('http://localhost:3000/api/user/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
 
-  localStorage.setItem("login","true");
-  location.href="dashboard.html";
+    const data = await response.json();
+    
+    if (!response.ok) {
+      alert(data.error || "Login gagal");
+      return;
+    }
+
+    const user = data.user;
+    localStorage.setItem("login","true");
+    localStorage.setItem("user_id", user.id);
+    localStorage.setItem("username", user.username);
+    localStorage.setItem("nama", user.nama);
+    location.href="dashboard.html";
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Error: " + error.message);
+  }
 }
 
 function checkLogin(){
@@ -47,5 +75,38 @@ function checkLogin(){
 
 function logout(){
   localStorage.removeItem("login");
+  localStorage.removeItem("user_id");
+  localStorage.removeItem("username");
+  localStorage.removeItem("nama");
   location.href="index.html";
+}
+
+// ===== ADMIN AUTHENTICATION =====
+function adminLogin(){
+  const username = document.getElementById('adminUsername').value;
+  const password = document.getElementById('adminPassword').value;
+
+  // Validasi credential admin
+  const adminUser = 'admin';
+  const adminPass = 'admin123';
+
+  if (username === adminUser && password === adminPass) {
+    localStorage.setItem('admin_login', 'true');
+    localStorage.setItem('admin_user', username);
+    location.href = 'admin-dashboard.html';
+  } else {
+    alert('Username atau password admin salah!');
+  }
+}
+
+function checkAdminLogin(){
+  if (!localStorage.getItem('admin_login')) {
+    location.href = 'login-admin.html';
+  }
+}
+
+function adminLogout(){
+  localStorage.removeItem('admin_login');
+  localStorage.removeItem('admin_user');
+  location.href = 'index.html';
 }
