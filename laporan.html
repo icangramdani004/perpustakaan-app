@@ -1,44 +1,277 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laporan</title>
+<title>Laporan - Perpustakaan Digital</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body onload="checkLogin()">
+<body onload="checkLogin(); loadLaporan()">
 
+<!-- NAVBAR -->
 <div class="navbar">
   <div class="nav-wrap">
     <div class="brand">
-      <img src="assets/logo-mandala.jpg">
+      <img src="assets/logo-mandala.jpg" alt="Logo">
       <span class="brand-title">Perpustakaan Digital</span>
     </div>
+
     <div class="hamburger" onclick="toggleMenu()">☰</div>
+
     <div class="menu" id="menu">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="katalog.html">Katalog</a>
-      <a href="pinjam.html">Peminjaman</a>
-      <a href="riwayat.html">Riwayat</a>
-      <a href="denda.html">Denda</a>
-      <a href="anggota.html">Anggota</a>
-      <a href="notifikasi.html">Notifikasi</a>
-      <a href="laporan.html" class="active">Laporan</a>
-      <a href="tentang.html">Tentang</a>
-      <a href="#" onclick="logout()">Logout</a>
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="katalog.html">📚 Katalog</a>
+      <a href="pinjam.html">📤 Peminjaman</a>
+      <a href="riwayat.html">📋 Riwayat</a>
+      <a href="denda.html">⚠️ Denda</a>
+      <a href="anggota.html">👥 Anggota</a>
+      <a href="notifikasi.html">🔔 Notifikasi</a>
+      <a href="laporan.html" class="active">📈 Laporan</a>
+      <a href="tentang.html">ℹ️ Tentang</a>
+      <a href="#" onclick="logout()" style="color: #ffcccc;">🚪 Logout</a>
     </div>
   </div>
 </div>
 
-<div class="container">
-  <div class="page-title">Laporan Perpustakaan</div>
-  <div class="cards">
-    <div class="card">Laporan Peminjaman</div>
-    <div class="card">Laporan Anggota</div>
-  </div>
-</div>
+<!-- CONTENT -->
+<main class="container">
 
-<footer>© 2025 Perpustakaan Kampus</footer>
+  <div class="page-title">📈 Laporan Perpustakaan</div>
+
+  <!-- Laporan Statistics -->
+  <div class="cards" style="margin-bottom: 24px;">
+    <div class="card" style="border-left-color: #667eea;">
+      <div class="card-icon">📚</div>
+      <h3>Total Buku</h3>
+      <p id="totalBuku">0</p>
+    </div>
+    <div class="card success">
+      <div class="card-icon">👥</div>
+      <h3>Total Member</h3>
+      <p id="totalMember">0</p>
+    </div>
+    <div class="card warning">
+      <div class="card-icon">📤</div>
+      <h3>Total Peminjaman</h3>
+      <p id="totalPeminjaman">0</p>
+    </div>
+    <div class="card danger">
+      <div class="card-icon">💰</div>
+      <h3>Total Denda</h3>
+      <p id="totalDendaAmount">Rp 0</p>
+    </div>
+  </div>
+
+  <!-- Borrowing Report -->
+  <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 24px;">
+    <h3 style="color: #0b3c5d; margin-top: 0;">📋 Laporan Peminjaman</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+      <div style="padding: 12px; background: #e3f2fd; border-radius: 6px;">
+        <p style="margin: 0; color: #666; font-size: 12px;">Peminjaman Aktif</p>
+        <p id="aktivPeminjaman" style="margin: 5px 0 0 0; color: #1976d2; font-weight: 600; font-size: 18px;">0</p>
+      </div>
+      <div style="padding: 12px; background: #d4edda; border-radius: 6px;">
+        <p style="margin: 0; color: #666; font-size: 12px;">Sudah Dikembalikan</p>
+        <p id="kembaliPeminjaman" style="margin: 5px 0 0 0; color: #28a745; font-weight: 600; font-size: 18px;">0</p>
+      </div>
+      <div style="padding: 12px; background: #fff3cd; border-radius: 6px;">
+        <p style="margin: 0; color: #666; font-size: 12px;">Buku Paling Dipinjam</p>
+        <p id="bukuTerpopuler" style="margin: 5px 0 0 0; color: #856404; font-weight: 600; font-size: 18px;">-</p>
+      </div>
+    </div>
+    
+    <h4 style="color: #0b3c5d; margin-top: 16px; margin-bottom: 12px;">Detail Peminjaman</h4>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Buku ID</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">User ID</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Tgl Pinjam</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Tgl Kembali</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="laporanPeminjamanBody">
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 20px; color: #999;">Memuat data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Fine Report -->
+  <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 24px;">
+    <h3 style="color: #0b3c5d; margin-top: 0;">💰 Laporan Denda</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px;">
+      <div style="padding: 12px; background: #f8d7da; border-radius: 6px;">
+        <p style="margin: 0; color: #666; font-size: 12px;">Denda Belum Dibayar</p>
+        <p id="dendaBelumBayar" style="margin: 5px 0 0 0; color: #721c24; font-weight: 600; font-size: 18px;">0</p>
+      </div>
+      <div style="padding: 12px; background: #d4edda; border-radius: 6px;">
+        <p style="margin: 0; color: #666; font-size: 12px;">Denda Sudah Dibayar</p>
+        <p id="dendaSudahBayar" style="margin: 5px 0 0 0; color: #155724; font-weight: 600; font-size: 18px;">0</p>
+      </div>
+      <div style="padding: 12px; background: #fff3cd; border-radius: 6px;">
+        <p style="margin: 0; color: #666; font-size: 12px;">Total Denda Belum Bayar</p>
+        <p id="totalDendaBelumBayar" style="margin: 5px 0 0 0; color: #856404; font-weight: 600; font-size: 16px;">Rp 0</p>
+      </div>
+    </div>
+
+    <h4 style="color: #0b3c5d; margin-top: 16px; margin-bottom: 12px;">Detail Denda</h4>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">ID</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Peminjaman ID</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Nominal</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="laporanDendaBody">
+          <tr>
+            <td colspan="4" style="text-align: center; padding: 20px; color: #999;">Memuat data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Category Report -->
+  <div style="background: white; padding: 24px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+    <h3 style="color: #0b3c5d; margin-top: 0;">📚 Laporan Kategori Buku</h3>
+    <div id="laporanKategori" style="display: grid; gap: 12px;">
+      <div style="text-align: center; padding: 20px; color: #999;">Memuat data...</div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p>© 2026 Perpustakaan Digital - Semua Hak Dilindungi</p>
+  <p style="font-size: 12px; opacity: 0.8;">Dibuat dengan ❤️ untuk memudahkan akses literatur</p>
+</footer>
+
+<script src="api.js"></script>
 <script src="script.js"></script>
+<script>
+async function loadLaporan() {
+  try {
+    // Load all data
+    const bukuResponse = await fetch('http://localhost:3000/api/buku');
+    const userResponse = await fetch('http://localhost:3000/api/user');
+    const peminjamanResponse = await fetch('http://localhost:3000/api/peminjaman');
+    const dendaResponse = await fetch('http://localhost:3000/api/denda');
+
+    if (!bukuResponse.ok || !userResponse.ok || !peminjamanResponse.ok || !dendaResponse.ok) {
+      throw new Error('Gagal memuat data');
+    }
+
+    const buku = await bukuResponse.json();
+    const users = await userResponse.json();
+    const peminjaman = await peminjamanResponse.json();
+    const denda = await dendaResponse.json();
+
+    // Update statistics
+    document.getElementById('totalBuku').textContent = buku.length;
+    document.getElementById('totalMember').textContent = users.length;
+    document.getElementById('totalPeminjaman').textContent = peminjaman.length;
+    
+    const totalDendaAmount = denda.reduce((sum, d) => sum + (parseInt(d.nominal) || 0), 0);
+    document.getElementById('totalDendaAmount').textContent = 'Rp ' + totalDendaAmount.toLocaleString('id-ID');
+
+    // Borrowing report
+    const aktivCount = peminjaman.filter(p => p.status === 'Dipinjam').length;
+    const kembaliCount = peminjaman.filter(p => p.status === 'Kembali').length;
+    
+    document.getElementById('aktivPeminjaman').textContent = aktivCount;
+    document.getElementById('kembaliPeminjaman').textContent = kembaliCount;
+
+    // Most borrowed book
+    const bukuCount = {};
+    peminjaman.forEach(p => {
+      bukuCount[p.buku_id] = (bukuCount[p.buku_id] || 0) + 1;
+    });
+    const mostBorrowed = Object.entries(bukuCount).reduce((max, [id, count]) => count > max[1] ? [id, count] : max, ['', 0]);
+    document.getElementById('bukuTerpopuler').textContent = mostBorrowed[0] ? `${mostBorrowed[0]} (${mostBorrowed[1]}x)` : '-';
+
+    // Display peminjaman table
+    const peminjamanBody = document.getElementById('laporanPeminjamanBody');
+    peminjamanBody.innerHTML = peminjaman.slice(0, 20).map(p => {
+      const statusColor = p.status === 'Kembali' ? '#d4edda' : '#fff3cd';
+      return `
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">${p.buku_id}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">${p.user_id}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">${new Date(p.tgl_pinjam).toLocaleDateString('id-ID')}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">${new Date(p.tgl_kembali).toLocaleDateString('id-ID')}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">
+            <span style="background: ${statusColor}; padding: 4px 8px; border-radius: 3px; font-size: 12px; color: ${p.status === 'Kembali' ? '#155724' : '#856404'};">
+              ${p.status}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Fine report
+    const dendaBelumBayar = denda.filter(d => d.status === 'Belum dibayar').length;
+    const dendaSudahBayar = denda.filter(d => d.status === 'Dibayar').length;
+    const totalDendaBelumBayar = denda.filter(d => d.status === 'Belum dibayar').reduce((sum, d) => sum + (parseInt(d.nominal) || 0), 0);
+
+    document.getElementById('dendaBelumBayar').textContent = dendaBelumBayar;
+    document.getElementById('dendaSudahBayar').textContent = dendaSudahBayar;
+    document.getElementById('totalDendaBelumBayar').textContent = 'Rp ' + totalDendaBelumBayar.toLocaleString('id-ID');
+
+    // Display denda table
+    const dendaBody = document.getElementById('laporanDendaBody');
+    dendaBody.innerHTML = denda.slice(0, 20).map(d => {
+      const statusColor = d.status === 'Dibayar' ? '#d4edda' : '#f8d7da';
+      const nominalValue = parseInt(d.nominal) || 0;
+      return `
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">${d.id}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">${d.peminjaman_id}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">Rp ${nominalValue.toLocaleString('id-ID')}</td>
+          <td style="padding: 12px; border-bottom: 1px solid #eee;">
+            <span style="background: ${statusColor}; padding: 4px 8px; border-radius: 3px; font-size: 12px; color: ${d.status === 'Dibayar' ? '#155724' : '#721c24'};">
+              ${d.status}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Category report
+    const categories = {};
+    buku.forEach(b => {
+      categories[b.kategori] = (categories[b.kategori] || 0) + 1;
+    });
+
+    const kategoriHtml = Object.entries(categories).map(([cat, count]) => {
+      const pct = Math.round((count / buku.length) * 100);
+      return `
+        <div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-weight: 600; color: #0b3c5d;">${cat}</span>
+            <span style="font-size: 13px; color: #666;">${count} buku (${pct}%)</span>
+          </div>
+          <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+            <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${pct}%;"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    document.getElementById('laporanKategori').innerHTML = kategoriHtml || '<p style="text-align: center; color: #999;">Tidak ada data kategori</p>';
+
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error: ' + error.message);
+  }
+}
+</script>
 </body>
 </html>

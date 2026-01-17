@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Perpustakaan Digital</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .admin-login-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 420px;
+      padding: 50px 40px;
+    }
+
+    .admin-login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .admin-login-icon {
+      font-size: 48px;
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    .admin-login-header h1 {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .admin-login-header p {
+      color: #999;
+      font-size: 14px;
+    }
+
+    .admin-form-group {
+      margin-bottom: 20px;
+    }
+
+    .admin-form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .admin-form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 5px;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+
+    .admin-form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .admin-login-btn {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .admin-login-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .admin-login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .admin-message {
+      padding: 12px 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      display: none;
+      font-size: 14px;
+      border-left: 4px solid;
+    }
+
+    .admin-message.show {
+      display: block;
+    }
+
+    .admin-message.success {
+      background: #d4edda;
+      color: #155724;
+      border-left-color: #28a745;
+    }
+
+    .admin-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border-left-color: #dc3545;
+    }
+
+    .admin-back-link {
+      text-align: center;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .admin-back-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .admin-back-link a:hover {
+      text-decoration: underline;
+    }
+
+    .admin-demo-info {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .admin-demo-info strong {
+      color: #667eea;
+      display: block;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-login-container">
+  <div class="admin-login-header">
+    <span class="admin-login-icon">🔐</span>
+    <h1>Admin Login</h1>
+    <p>Akses panel administrasi perpustakaan</p>
+  </div>
+
+  <div id="adminMessage" class="admin-message"></div>
+
+  <form onsubmit="adminHandleLogin(event)">
+    <div class="admin-form-group">
+      <label for="adminUsername">Username</label>
+      <input 
+        id="adminUsername" 
+        type="text" 
+        placeholder="Masukkan username admin" 
+        required
+        autocomplete="off"
+      >
+    </div>
+
+    <div class="admin-form-group">
+      <label for="adminPassword">Password</label>
+      <input 
+        id="adminPassword" 
+        type="password" 
+        placeholder="Masukkan password admin" 
+        required
+        autocomplete="off"
+      >
+    </div>
+
+    <button type="submit" id="adminLoginBtn" class="admin-login-btn">
+      🚀 Login Admin
+    </button>
+  </form>
+
+  <div class="admin-back-link">
+    <a href="index.html">← Kembali ke Login Member</a>
+  </div>
+
+
+</div>
+
+<script>
+const API_URL = 'http://localhost:3000/api';
+
+function adminShowMessage(text, type = 'info') {
+  const el = document.getElementById('adminMessage');
+  el.textContent = text;
+  el.className = `admin-message show ${type}`;
+  
+  if (type !== 'error') {
+    setTimeout(() => {
+      el.classList.remove('show');
+    }, 4000);
+  }
+}
+
+async function adminHandleLogin(event) {
+  event.preventDefault();
+  
+  const username = document.getElementById('adminUsername').value.trim();
+  const password = document.getElementById('adminPassword').value.trim();
+  const btn = document.getElementById('adminLoginBtn');
+
+  // Strict validation - both fields must be filled
+  if (!username) {
+    adminShowMessage('Username harus diisi!', 'error');
+    document.getElementById('adminUsername').focus();
+    return;
+  }
+
+  if (!password) {
+    adminShowMessage('Password harus diisi!', 'error');
+    document.getElementById('adminPassword').focus();
+    return;
+  }
+
+  // Check minimum length
+  if (username.length < 3) {
+    adminShowMessage('Username minimal 3 karakter!', 'error');
+    return;
+  }
+
+  if (password.length < 1) {
+    adminShowMessage('Password tidak boleh kosong!', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Sedang login...';
+
+  try {
+    console.log('Admin login attempt:', username);
+    
+    const response = await fetch(`${API_URL}/user/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const result = await response.json();
+    console.log('Login response:', result);
+
+    if (!response.ok) {
+      adminShowMessage(result.error || 'Login gagal', 'error');
+      btn.disabled = false;
+      btn.textContent = '🚀 Login Admin';
+      // Clear password field after failed login
+      document.getElementById('adminPassword').value = '';
+      document.getElementById('adminPassword').focus();
+      return;
+    }
+
+    // Get user data from response
+    const userData = result.user || result.data;
+    if (!userData) {
+      adminShowMessage('Data user tidak ditemukan', 'error');
+      btn.disabled = false;
+      btn.textContent = '🚀 Login Admin';
+      return;
+    }
+
+    // Check if admin
+    if (userData.role !== 'admin') {
+      adminShowMessage('❌ Hanya admin yang dapat login di halaman ini', 'error');
+      btn.disabled = false;
+      btn.textContent = '🚀 Login Admin';
+      // Clear password field after failed login
+      document.getElementById('adminPassword').value = '';
+      return;
+    }
+
+    // Set admin session
+    localStorage.clear();
+    localStorage.setItem('admin_login', 'true');
+    localStorage.setItem('admin_id', String(userData.id));
+    localStorage.setItem('admin_user', userData.username);
+    localStorage.setItem('admin_nama', userData.nama || 'Administrator');
+    localStorage.setItem('admin_role', 'admin');
+
+    console.log('✅ Admin login successful. Redirecting...');
+    adminShowMessage('✅ Login berhasil! Redirecting...', 'success');
+    
+    setTimeout(() => {
+      window.location.href = 'admin-dashboard.html';
+    }, 1200);
+
+  } catch (error) {
+    console.error('Login error:', error);
+    adminShowMessage('❌ Koneksi server gagal. Pastikan backend running (node server.js)', 'error');
+    btn.disabled = false;
+    btn.textContent = '🚀 Login Admin';
+    // Clear password field after error
+    document.getElementById('adminPassword').value = '';
+  }
+}
+
+// Check if already logged in
+window.addEventListener('load', () => {
+  // Clear form on page load to prevent autofill issues
+  document.getElementById('adminUsername').value = '';
+  document.getElementById('adminPassword').value = '';
+  
+  if (localStorage.getItem('admin_login') === 'true') {
+    console.log('User already logged in, redirecting to dashboard...');
+    window.location.href = 'admin-dashboard.html';
+  }
+  console.log('✅ Admin login page loaded successfully');
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Perpustakaan Digital</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    .admin-wrapper {
+      display: flex;
+      min-height: 100vh;
+      background: #f5f7fa;
+    }
+
+    .admin-sidebar {
+      width: 250px;
+      background: #2c3e50;
+      color: white;
+      padding: 20px 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .admin-sidebar h3 {
+      margin: 0 0 20px 0;
+      padding: 0 20px;
+      font-size: 18px;
+      color: #3498db;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sidebar-menu li {
+      margin: 0;
+    }
+
+    .sidebar-menu a {
+      display: block;
+      padding: 12px 20px;
+      color: #ecf0f1;
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-menu a:hover {
+      background: #34495e;
+      border-left-color: #3498db;
+      color: #3498db;
+    }
+
+    .sidebar-menu a.active {
+      background: #3498db;
+      border-left-color: #2980b9;
+      color: white;
+    }
+
+    .admin-main {
+      margin-left: 250px;
+      flex: 1;
+    }
+
+    .admin-header {
+      background: #667eea;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .admin-header h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .admin-header .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .admin-header a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .admin-header a:hover {
+      background: rgba(0,0,0,0.3);
+    }
+
+    .admin-content {
+      padding: 30px;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-top: 4px solid #667eea;
+      text-align: center;
+    }
+
+    .stat-card h3 {
+      color: #666;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin: 0 0 10px 0;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .section-card {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    .section-card h2 {
+      color: #2c3e50;
+      margin: 0 0 20px 0;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .btn-group {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 13px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-success {
+      background: #27ae60;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #229954;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    .btn-secondary {
+      background: #95a5a6;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border: 1px solid #ddd;
+    }
+
+    table th {
+      background: #3498db;
+      color: white;
+      padding: 14px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 13px;
+      border-bottom: 3px solid #2980b9;
+    }
+
+    table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #ecf0f1;
+      font-size: 13px;
+      color: #2c3e50;
+    }
+
+    table tbody tr:nth-child(odd) {
+      background: #f8f9fa;
+    }
+
+    table tbody tr:nth-child(even) {
+      background: white;
+    }
+
+    table tr:hover {
+      background: #e8f4f8;
+    }
+
+    .message {
+      padding: 12px 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      border-left: 4px solid;
+      display: none;
+      font-size: 13px;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border-left-color: #28a745;
+    }
+
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border-left-color: #dc3545;
+    }
+
+    .message.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border-left-color: #17a2b8;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      color: #2c3e50;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 5px;
+    }
+
+    .action-btns .btn {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge-danger {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .badge-warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #7f8c8d;
+    }
+
+    .empty-state p {
+      margin: 10px 0;
+    }
+
+    @media (max-width: 768px) {
+      .admin-sidebar {
+        width: 200px;
+      }
+
+      .admin-main {
+        margin-left: 200px;
+      }
+
+      .admin-content {
+        padding: 15px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .admin-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="admin-wrapper">
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <h3>⚙️ ADMIN</h3>
+    <ul class="sidebar-menu">
+      <li><a href="#" onclick="switchSection('dashboard'); return false;" class="menu-link active">📊 Dashboard</a></li>
+      <li><a href="#" onclick="switchSection('books'); return false;" class="menu-link">📚 Manajemen Buku</a></li>
+      <li><a href="#" onclick="switchSection('members'); return false;" class="menu-link">👥 Manajemen Member</a></li>
+      <li><a href="#" onclick="switchSection('loans'); return false;" class="menu-link">📤 Peminjaman</a></li>
+      <li><a href="#" onclick="switchSection('fines'); return false;" class="menu-link">💰 Denda</a></li>
+      <li><a href="#" onclick="switchSection('reports'); return false;" class="menu-link">📋 Laporan</a></li>
+      <li style="margin-top: 20px; border-top: 1px solid #34495e; padding-top: 20px;">
+        <a href="#" onclick="adminLogout(); return false;" class="menu-link" style="color: #e74c3c;">🚪 Logout</a>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="admin-main">
+    <header class="admin-header">
+      <h2 id="pageTitle">📊 Dashboard</h2>
+      <div class="user-info">
+        <span id="adminName">Loading...</span>
+        <a href="#" onclick="adminLogout(); return false;">Logout</a>
+      </div>
+    </header>
+
+    <div class="admin-content">
+
+      <!-- DASHBOARD SECTION -->
+      <div id="dashboard" class="content-section active">
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <h3>📚 Total Buku</h3>
+            <div class="stat-value" id="totalBooks">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>👥 Total Member</h3>
+            <div class="stat-value" id="totalMembers">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>📤 Peminjaman Aktif</h3>
+            <div class="stat-value" id="activeLoan">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>💰 Denda Pending</h3>
+            <div class="stat-value" id="totalFines">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOOKS MANAGEMENT SECTION -->
+      <div id="books" class="content-section">
+        <div class="section-card">
+          <h2>📚 Manajemen Buku</h2>
+          <div id="booksMessage" class="message"></div>
+          
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="openAddBookModal()">➕ Tambah Buku</button>
+          </div>
+
+          <div class="table-responsive" id="booksTable">
+            <p style="text-align: center; color: #999;">Loading books...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MEMBERS MANAGEMENT SECTION -->
+      <div id="members" class="content-section">
+        <div class="section-card">
+          <h2>👥 Manajemen Member</h2>
+          <div id="membersMessage" class="message"></div>
+
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="openAddMemberModal()">➕ Tambah Member</button>
+          </div>
+
+          <div class="table-responsive" id="membersTable">
+            <p style="text-align: center; color: #999;">Loading members...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOANS MANAGEMENT SECTION -->
+      <div id="loans" class="content-section">
+        <div class="section-card">
+          <h2>📤 Peminjaman Aktif</h2>
+          <div id="loansMessage" class="message"></div>
+
+          <div class="table-responsive" id="loansTable">
+            <p style="text-align: center; color: #999;">Loading loans...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINES MANAGEMENT SECTION -->
+      <div id="fines" class="content-section">
+        <div class="section-card">
+          <h2>💰 Manajemen Denda</h2>
+          <div id="finesMessage" class="message"></div>
+
+          <div class="table-responsive" id="finesTable">
+            <p style="text-align: center; color: #999;">Loading fines...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORTS SECTION -->
+      <div id="reports" class="content-section">
+        <div class="section-card">
+          <h2>📋 Laporan Sistem</h2>
+          <div id="reportsMessage" class="message"></div>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="generateReport('daily')">📅 Laporan Harian</button>
+            <button class="btn btn-primary" onclick="generateReport('monthly')">📊 Laporan Bulanan</button>
+            <button class="btn btn-success" onclick="exportData()">💾 Export Data</button>
+          </div>
+          <div id="reportContent" style="margin-top: 20px;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADD BOOK MODAL -->
+<div id="addBookModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Tambah Buku Baru</h3>
+      <button class="close-btn" onclick="closeModal('addBookModal')">&times;</button>
+    </div>
+    <div id="bookFormMessage" class="message"></div>
+    <form onsubmit="submitBook(event)">
+      <div class="form-group">
+        <label for="bookJudul">Judul Buku *</label>
+        <input type="text" id="bookJudul" required>
+      </div>
+      <div class="form-group">
+        <label for="bookPengarang">Pengarang *</label>
+        <input type="text" id="bookPengarang" required>
+      </div>
+      <div class="form-group">
+        <label for="bookPenerbit">Penerbit *</label>
+        <input type="text" id="bookPenerbit" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="bookTahun">Tahun Terbit *</label>
+          <input type="number" id="bookTahun" required>
+        </div>
+        <div class="form-group">
+          <label for="bookIsbn">ISBN *</label>
+          <input type="text" id="bookIsbn" placeholder="978-XXXXXXXXXX" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="bookKategori">Kategori</label>
+          <input type="text" id="bookKategori" placeholder="Teknologi, Referensi, dll">
+        </div>
+        <div class="form-group">
+          <label for="bookStok">Stok *</label>
+          <input type="number" id="bookStok" required min="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="bookDeskripsi">Deskripsi</label>
+        <textarea id="bookDeskripsi" placeholder="Masukkan deskripsi buku..."></textarea>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="submit" class="btn btn-success" style="flex: 1;">✅ Simpan</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addBookModal')" style="flex: 1;">❌ Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div id="addMemberModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Tambah Member Baru</h3>
+      <button class="close-btn" onclick="closeModal('addMemberModal')">&times;</button>
+    </div>
+    <div id="memberFormMessage" class="message"></div>
+    <form onsubmit="submitMember(event)">
+      <div class="form-group">
+        <label for="memberNama">Nama Lengkap</label>
+        <input type="text" id="memberNama" required>
+      </div>
+      <div class="form-group">
+        <label for="memberNim">NIM</label>
+        <input type="text" id="memberNim" required>
+      </div>
+      <div class="form-group">
+        <label for="memberUsername">Username</label>
+        <input type="text" id="memberUsername" required>
+      </div>
+      <div class="form-group">
+        <label for="memberPassword">Password</label>
+        <input type="password" id="memberPassword" required>
+      </div>
+      <div class="form-group">
+      <div class="form-group">
+        <label for="memberPassword">Password *</label>
+        <input type="password" id="memberPassword" required>
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <button type="submit" class="btn btn-success" style="flex: 1;">✅ Simpan</button>
+        <button type="button" class="btn btn-secondary" onclick="closeModal('addMemberModal')" style="flex: 1;">❌ Batal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+const API_URL = 'http://localhost:3000/api';
+
+// ===== PAGE SWITCHING =====
+function switchSection(section) {
+  // Hide all sections
+  document.querySelectorAll('.content-section').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  // Remove active from all menu links
+  document.querySelectorAll('.menu-link').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  // Show selected section
+  const sectionEl = document.getElementById(section);
+  if (sectionEl) {
+    sectionEl.classList.add('active');
+  }
+
+  // Mark menu link as active
+  event.target.classList.add('active');
+
+  // Update page title
+  const titles = {
+    dashboard: '📊 Dashboard',
+    books: '📚 Manajemen Buku',
+    members: '👥 Manajemen Member',
+    loans: '📤 Peminjaman',
+    fines: '💰 Denda',
+    reports: '📋 Laporan'
+  };
+  document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
+
+  // Load section data
+  if (section === 'dashboard') {
+    loadDashboardData();
+  } else if (section === 'books') {
+    loadBooksData();
+  } else if (section === 'members') {
+    loadMembersData();
+  } else if (section === 'loans') {
+    loadLoansData();
+  } else if (section === 'fines') {
+    loadFinesData();
+  }
+}
+
+// ===== MODAL FUNCTIONS =====
+function openModal(modalId) {
+  document.getElementById(modalId).classList.add('show');
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('show');
+}
+
+function openAddBookModal() {
+  document.getElementById('bookJudul').value = '';
+  document.getElementById('bookPengarang').value = '';
+  document.getElementById('bookPenerbit').value = '';
+  document.getElementById('bookTahun').value = new Date().getFullYear();
+  document.getElementById('bookIsbn').value = '';
+  document.getElementById('bookKategori').value = '';
+  document.getElementById('bookStok').value = '0';
+  document.getElementById('bookDeskripsi').value = '';
+  document.getElementById('bookFormMessage').className = 'message';
+  openModal('addBookModal');
+}
+
+function openAddMemberModal() {
+  document.getElementById('memberNama').value = '';
+  document.getElementById('memberNim').value = '';
+  document.getElementById('memberUsername').value = '';
+  document.getElementById('memberPassword').value = '';
+  document.getElementById('memberFormMessage').className = 'message';
+  openModal('addMemberModal');
+}
+
+// ===== ADMIN FUNCTIONS =====
+function checkAdminLogin() {
+  const adminLogin = localStorage.getItem('admin_login');
+  const adminUser = localStorage.getItem('admin_user');
+  
+  console.log('Checking login... admin_login:', adminLogin, 'admin_user:', adminUser);
+  
+  if (adminLogin !== 'true' || !adminUser) {
+    console.log('Not logged in, redirecting to login...');
+    window.location.href = 'admin-login-bersih.html';
+    return false;
+  }
+  
+  // Display admin name
+  document.getElementById('adminName').textContent = `👤 ${adminUser} (Admin)`;
+  console.log('✅ Admin authenticated:', adminUser);
+  return true;
+}
+
+function adminLogout() {
+  if (confirm('Yakin mau logout?')) {
+    localStorage.clear();
+    window.location.href = 'index.html';
+  }
+}
+
+// ===== FORM SUBMISSIONS =====
+async function submitBook(event) {
+  event.preventDefault();
+  
+  const bookData = {
+    judul: document.getElementById('bookJudul').value,
+    pengarang: document.getElementById('bookPengarang').value,
+    penerbit: document.getElementById('bookPenerbit').value,
+    tahun: parseInt(document.getElementById('bookTahun').value),
+    isbn: document.getElementById('bookIsbn').value,
+    kategori: document.getElementById('bookKategori').value || 'Umum',
+    stok: parseInt(document.getElementById('bookStok').value),
+    deskripsi: document.getElementById('bookDeskripsi').value
+  };
+
+  try {
+    const res = await fetch(`${API_URL}/buku`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bookData)
+    });
+
+    const data = await res.json();
+    
+    if (res.ok) {
+      showMessage('✅ Buku berhasil ditambahkan!', 'success', 'bookFormMessage');
+      setTimeout(() => {
+        closeModal('addBookModal');
+        loadBooksData();
+      }, 1000);
+    } else {
+      showMessage('❌ Error: ' + (data.error || 'Gagal tambah buku'), 'error', 'bookFormMessage');
+    }
+  } catch (error) {
+    showMessage('❌ Error: ' + error.message, 'error', 'bookFormMessage');
+  }
+}
+
+async function submitMember(event) {
+  event.preventDefault();
+
+  const memberData = {
+    nama: document.getElementById('memberNama').value,
+    nim: document.getElementById('memberNim').value,
+    username: document.getElementById('memberUsername').value,
+    password: document.getElementById('memberPassword').value
+  };
+
+  try {
+    const res = await fetch(`${API_URL}/user/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(memberData)
+    });
+
+    const data = await res.json();
+    
+    if (res.ok) {
+      showMessage('✅ Member berhasil ditambahkan!', 'success', 'memberFormMessage');
+      setTimeout(() => {
+        closeModal('addMemberModal');
+        loadMembersData();
+      }, 1000);
+    } else {
+      showMessage('❌ Error: ' + (data.error || 'Gagal tambah member'), 'error', 'memberFormMessage');
+    }
+  } catch (error) {
+    showMessage('❌ Error: ' + error.message, 'error', 'memberFormMessage');
+  }
+}
+
+// ===== DATA LOADING =====
+async function loadDashboardData() {
+  try {
+    const booksRes = await fetch(`${API_URL}/buku`);
+    const books = booksRes.ok ? await booksRes.json() : [];
+
+    const membersRes = await fetch(`${API_URL}/user`);
+    const members = membersRes.ok ? await membersRes.json() : [];
+
+    const loansRes = await fetch(`${API_URL}/peminjaman`);
+    const loans = loansRes.ok ? await loansRes.json() : [];
+
+    const finesRes = await fetch(`${API_URL}/denda`);
+    const fines = finesRes.ok ? await finesRes.json() : [];
+
+    document.getElementById('totalBooks').textContent = books.length;
+    document.getElementById('totalMembers').textContent = members.length;
+    const activeLoans = loans.filter(l => l.status === 'Dipinjam');
+    document.getElementById('activeLoan').textContent = activeLoans.length;
+    const pendingFines = fines.filter(f => f.status !== 'Sudah dibayar' && f.status !== 'Lunas');
+    document.getElementById('totalFines').textContent = pendingFines.length;
+  } catch (error) {
+    console.error('Error loading dashboard:', error);
+  }
+}
+
+async function loadBooksData() {
+  try {
+    const res = await fetch(`${API_URL}/buku`);
+    const books = res.ok ? await res.json() : [];
+
+    if (books.length === 0) {
+      document.getElementById('booksTable').innerHTML = '<div class="empty-state"><p>📭 Tidak ada buku</p></div>';
+      return;
+    }
+
+    let html = '<table><thead><tr><th>ID</th><th>Judul</th><th>Pengarang</th><th>ISBN</th><th>Kategori</th><th>Stok</th><th>Aksi</th></tr></thead><tbody>';
+    
+    books.forEach(book => {
+      const stokClass = book.stok <= 2 ? 'style="color: #e74c3c; font-weight: bold;"' : '';
+      html += `<tr>
+        <td>#${book.id}</td>
+        <td>${book.judul}</td>
+        <td>${book.pengarang}</td>
+        <td>${book.isbn}</td>
+        <td><span class="badge" style="background: #3498db; color: white;">${book.kategori || 'Umum'}</span></td>
+        <td ${stokClass}>${book.stok}</td>
+        <td>
+          <div class="action-btns">
+            <button class="btn btn-secondary" onclick="editBook(${book.id})">✏️ Edit</button>
+            <button class="btn btn-danger" onclick="deleteBook(${book.id})">🗑️ Hapus</button>
+          </div>
+        </td>
+      </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('booksTable').innerHTML = html;
+  } catch (error) {
+    console.error('Error loading books:', error);
+    showMessage('❌ Gagal load data buku', 'error', 'booksMessage');
+  }
+}
+
+async function loadMembersData() {
+  try {
+    const res = await fetch(`${API_URL}/user`);
+    const members = res.ok ? await res.json() : [];
+
+    if (members.length === 0) {
+      document.getElementById('membersTable').innerHTML = '<div class="empty-state"><p>📭 Tidak ada member</p></div>';
+      return;
+    }
+
+    let html = '<table><thead><tr><th>ID</th><th>Nama</th><th>NIM</th><th>Username</th><th>Role</th><th>Aksi</th></tr></thead><tbody>';
+    
+    members.forEach(member => {
+      // Determine if user is admin
+      const isAdmin = member.username === 'admin';
+      const roleBadge = isAdmin ? '<span class="badge badge-success">👤 Admin</span>' : '<span class="badge badge-warning">👤 Member</span>';
+      
+      html += `<tr>
+        <td>#${member.id}</td>
+        <td>${member.nama}</td>
+        <td>${member.nim}</td>
+        <td><strong>${member.username}</strong></td>
+        <td>${roleBadge}</td>
+        <td>
+          <div class="action-btns">
+            ${isAdmin ? '-' : `<button class="btn btn-danger" onclick="deleteMember(${member.id})">🗑️ Hapus</button>`}
+          </div>
+        </td>
+      </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('membersTable').innerHTML = html;
+  } catch (error) {
+    console.error('Error loading members:', error);
+    showMessage('❌ Gagal load data member', 'error', 'membersMessage');
+  }
+}
+
+async function loadLoansData() {
+  try {
+    const res = await fetch(`${API_URL}/peminjaman`);
+    const loans = res.ok ? await res.json() : [];
+
+    const activeLoans = loans.filter(l => l.status === 'Dipinjam');
+
+    if (activeLoans.length === 0) {
+      document.getElementById('loansTable').innerHTML = '<div class="empty-state"><p>📭 Tidak ada peminjaman aktif</p></div>';
+      return;
+    }
+
+    let html = '<table><thead><tr><th>ID</th><th>Member</th><th>Buku</th><th>Tgl Pinjam</th><th>Tgl Kembali</th><th>Status</th><th>Aksi</th></tr></thead><tbody>';
+    
+    activeLoans.forEach(loan => {
+      const daysOverdue = getDaysOverdue(loan.tgl_kembali);
+      let statusBadge = '';
+      
+      if (daysOverdue > 0) {
+        statusBadge = `<span class="badge badge-danger">⚠️ Terlambat ${daysOverdue} hari</span>`;
+      } else {
+        const daysLeft = Math.ceil((new Date(loan.tgl_kembali) - new Date()) / (1000 * 60 * 60 * 24));
+        statusBadge = `<span class="badge badge-warning">⏱️ ${daysLeft} hari lagi</span>`;
+      }
+      
+      html += `<tr>
+        <td>#${loan.id}</td>
+        <td>${loan.nama || 'User ' + loan.user_id}</td>
+        <td>${loan.judul || 'Buku ' + loan.buku_id}</td>
+        <td>${new Date(loan.tgl_pinjam).toLocaleDateString('id-ID')}</td>
+        <td>${new Date(loan.tgl_kembali).toLocaleDateString('id-ID')}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="btn btn-success" onclick="returnLoan(${loan.id})">✅ Kembalikan</button>
+        </td>
+      </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('loansTable').innerHTML = html;
+  } catch (error) {
+    console.error('Error loading loans:', error);
+    showMessage('❌ Gagal load data peminjaman', 'error', 'loansMessage');
+  }
+}
+
+async function loadFinesData() {
+  try {
+    const res = await fetch(`${API_URL}/denda`);
+    const fines = res.ok ? await res.json() : [];
+
+    if (fines.length === 0) {
+      document.getElementById('finesTable').innerHTML = '<div class="empty-state"><p>📭 Tidak ada denda</p></div>';
+      return;
+    }
+
+    let html = '<table><thead><tr><th>ID</th><th>Member</th><th>Buku</th><th>Nominal</th><th>Alasan</th><th>Status</th><th>Aksi</th></tr></thead><tbody>';
+    
+    fines.forEach(fine => {
+      const isPaid = fine.status === 'Sudah dibayar' || fine.status === 'Lunas';
+      const statusBadge = isPaid
+        ? '<span class="badge badge-success">✅ Lunas</span>' 
+        : '<span class="badge badge-danger">⏳ Belum Dibayar</span>';
+      
+      html += `<tr>
+        <td>#${fine.id}</td>
+        <td>${fine.nama || 'User ' + fine.user_id}</td>
+        <td>${fine.judul || 'Buku ' + fine.buku_id}</td>
+        <td><strong>Rp ${parseInt(fine.nominal).toLocaleString('id-ID')}</strong></td>
+        <td>${fine.alasan || '-'}</td>
+        <td>${statusBadge}</td>
+        <td>
+          ${!isPaid ? `<button class="btn btn-success" onclick="markFinePaid(${fine.id})">💳 Bayar</button>` : '-'}
+        </td>
+      </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    document.getElementById('finesTable').innerHTML = html;
+  } catch (error) {
+    console.error('Error loading fines:', error);
+    showMessage('❌ Gagal load data denda', 'error', 'finesMessage');
+  }
+}
+
+// ===== UTILITY FUNCTIONS =====
+function getDaysOverdue(dueDate) {
+  const today = new Date();
+  const due = new Date(dueDate);
+  const diff = today - due;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  return days > 0 ? days : 0;
+}
+
+function showMessage(text, type, elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.textContent = text;
+  el.className = `message show ${type}`;
+}
+
+async function deleteBook(bookId) {
+  if (confirm('⚠️ Yakin hapus buku ini? Tindakan tidak bisa dibatalkan.')) {
+    try {
+      const res = await fetch(`${API_URL}/buku/${bookId}`, { method: 'DELETE' });
+      const data = await res.json();
+      
+      if (res.ok) {
+        showMessage('✅ Buku berhasil dihapus!', 'success', 'booksMessage');
+        loadBooksData();
+      } else {
+        showMessage('❌ Error: ' + (data.error || 'Gagal hapus buku'), 'error', 'booksMessage');
+      }
+    } catch (error) {
+      showMessage('❌ Error: ' + error.message, 'error', 'booksMessage');
+    }
+  }
+}
+
+async function editMember(memberId) {
+  alert('Edit member #' + memberId + ' (Coming soon)');
+}
+
+async function deleteMember(memberId) {
+  if (confirm('⚠️ Yakin hapus member ini? Tindakan tidak bisa dibatalkan.')) {
+    try {
+      // Try to delete via API
+      const res = await fetch(`${API_URL}/user/${memberId}`, { method: 'DELETE' });
+      const data = await res.json();
+      
+      if (res.ok) {
+        showMessage('✅ Member berhasil dihapus!', 'success', 'membersMessage');
+        loadMembersData();
+      } else if (res.status === 404 || res.status === 405) {
+        // Endpoint tidak ada, coba alternative atau tampilkan pesan
+        showMessage('❌ Endpoint delete tidak tersedia. Hubungi admin sistem.', 'error', 'membersMessage');
+      } else {
+        showMessage('❌ Error: ' + (data.error || 'Gagal hapus member'), 'error', 'membersMessage');
+      }
+    } catch (error) {
+      showMessage('❌ Endpoint delete tidak tersedia. Hubungi admin sistem.', 'error', 'membersMessage');
+      console.error('Delete member error:', error);
+    }
+  }
+}
+
+async function returnLoan(loanId) {
+  if (confirm('✅ Konfirmasi pengembalian buku ini?')) {
+    try {
+      const res = await fetch(`${API_URL}/peminjaman/${loanId}/return`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Dikembalikan' })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        showMessage('✅ Pengembalian berhasil dicatat!', 'success', 'loansMessage');
+        loadLoansData();
+      } else {
+        showMessage('❌ Error: ' + (data.error || 'Gagal catat pengembalian'), 'error', 'loansMessage');
+      }
+    } catch (error) {
+      showMessage('❌ Error: ' + error.message, 'error', 'loansMessage');
+    }
+  }
+}
+
+async function markFinePaid(fineId) {
+  if (confirm('💳 Tandai denda sebagai lunas?')) {
+    try {
+      const res = await fetch(`${API_URL}/denda/${fineId}/bayar`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Sudah dibayar' })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok) {
+        showMessage('✅ Denda berhasil ditandai lunas!', 'success', 'finesMessage');
+        loadFinesData();
+      } else {
+        showMessage('❌ Error: ' + (data.error || 'Gagal update denda'), 'error', 'finesMessage');
+      }
+    } catch (error) {
+      showMessage('❌ Error: ' + error.message, 'error', 'finesMessage');
+    }
+  }
+}
+
+async function generateReport(type) {
+  try {
+    // Get all data
+    const [booksRes, usersRes, loansRes, finesRes] = await Promise.all([
+      fetch(`${API_URL}/buku`),
+      fetch(`${API_URL}/user`),
+      fetch(`${API_URL}/peminjaman`),
+      fetch(`${API_URL}/denda`)
+    ]);
+
+    const books = await booksRes.json();
+    const users = await usersRes.json();
+    const loans = await loansRes.json();
+    const fines = await finesRes.json();
+
+    let reportHTML = `<div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">`;
+    
+    if (type === 'daily') {
+      const today = new Date().toLocaleDateString('id-ID');
+      const todaysLoans = loans.filter(l => new Date(l.created_at).toLocaleDateString('id-ID') === today);
+      const todaysFines = fines.filter(f => new Date(f.created_at).toLocaleDateString('id-ID') === today);
+      
+      reportHTML += `
+        <h3>📅 Laporan Harian - ${today}</h3>
+        <div style="margin-top: 15px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #1976d2; font-weight: 600;">Peminjaman Hari Ini</div>
+              <div style="font-size: 28px; font-weight: bold; color: #1976d2; margin-top: 5px;">${todaysLoans.length}</div>
+            </div>
+            <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #f57c00; font-weight: 600;">Denda Hari Ini</div>
+              <div style="font-size: 28px; font-weight: bold; color: #f57c00; margin-top: 5px;">Rp ${todaysFines.reduce((sum, f) => sum + parseInt(f.nominal || 0), 0).toLocaleString('id-ID')}</div>
+            </div>
+          </div>
+
+          <h4 style="margin-top: 20px;">Detail Peminjaman Hari Ini:</h4>
+          ${todaysLoans.length > 0 ? `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <thead style="background: #f5f5f5;">
+                <tr>
+                  <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Member</th>
+                  <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Buku</th>
+                  <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${todaysLoans.map(loan => `
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">${loan.nama || 'User ' + loan.user_id}</td>
+                    <td style="padding: 10px;">${loan.judul || 'Buku ' + loan.buku_id}</td>
+                    <td style="padding: 10px;"><span style="background: #fff3cd; color: #856404; padding: 5px 10px; border-radius: 3px;">${loan.status}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          ` : '<p style="color: #999; margin-top: 10px;">Tidak ada peminjaman hari ini</p>'}
+        </div>
+      `;
+    } else if (type === 'monthly') {
+      const currentMonth = new Date().toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+      const thisMonth = new Date().getMonth();
+      const thisYear = new Date().getFullYear();
+      
+      const monthlyLoans = loans.filter(l => {
+        const loanDate = new Date(l.created_at);
+        return loanDate.getMonth() === thisMonth && loanDate.getFullYear() === thisYear;
+      });
+      
+      const monthlyFines = fines.filter(f => {
+        const fineDate = new Date(f.created_at);
+        return fineDate.getMonth() === thisMonth && fineDate.getFullYear() === thisYear;
+      });
+
+      const totalFinesAmount = monthlyFines.reduce((sum, f) => sum + parseInt(f.nominal || 0), 0);
+      const paidFines = monthlyFines.filter(f => f.status === 'Sudah dibayar' || f.status === 'Lunas').length;
+      const unpaidFines = monthlyFines.filter(f => f.status === 'Belum dibayar').length;
+
+      reportHTML += `
+        <h3>📊 Laporan Bulanan - ${currentMonth}</h3>
+        <div style="margin-top: 15px;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
+            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #388e3c; font-weight: 600;">Total Peminjaman</div>
+              <div style="font-size: 28px; font-weight: bold; color: #388e3c; margin-top: 5px;">${monthlyLoans.length}</div>
+            </div>
+            <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #f57c00; font-weight: 600;">Total Denda</div>
+              <div style="font-size: 24px; font-weight: bold; color: #f57c00; margin-top: 5px;">Rp ${totalFinesAmount.toLocaleString('id-ID')}</div>
+            </div>
+            <div style="background: #c8e6c9; padding: 15px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #1b5e20; font-weight: 600;">Denda Lunas</div>
+              <div style="font-size: 28px; font-weight: bold; color: #1b5e20; margin-top: 5px;">${paidFines}</div>
+            </div>
+            <div style="background: #ffcdd2; padding: 15px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #c62828; font-weight: 600;">Denda Pending</div>
+              <div style="font-size: 28px; font-weight: bold; color: #c62828; margin-top: 5px;">${unpaidFines}</div>
+            </div>
+          </div>
+
+          <h4 style="margin-top: 20px;">Statistik Koleksi:</h4>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead style="background: #f5f5f5;">
+              <tr>
+                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Total Buku</th>
+                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Total Stok</th>
+                <th style="padding: 10px; text-align: left; border-bottom: 2px solid #ddd;">Total Member</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 10px; font-weight: bold;">${books.length} Judul</td>
+                <td style="padding: 10px; font-weight: bold;">${books.reduce((sum, b) => sum + b.stok, 0)} Eksemplar</td>
+                <td style="padding: 10px; font-weight: bold;">${users.length} Orang</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+    
+    reportHTML += `</div>`;
+    document.getElementById('reportContent').innerHTML = reportHTML;
+    showMessage(`✅ ${type === 'daily' ? 'Laporan harian' : 'Laporan bulanan'} berhasil dibuat`, 'success', 'reportsMessage');
+
+  } catch (error) {
+    console.error('Error generating report:', error);
+    showMessage('❌ Gagal membuat laporan: ' + error.message, 'error', 'reportsMessage');
+  }
+}
+
+async function exportData() {
+  try {
+    // Get all data
+    const [booksRes, usersRes, loansRes, finesRes] = await Promise.all([
+      fetch(`${API_URL}/buku`),
+      fetch(`${API_URL}/user`),
+      fetch(`${API_URL}/peminjaman`),
+      fetch(`${API_URL}/denda`)
+    ]);
+
+    const data = {
+      timestamp: new Date().toLocaleString('id-ID'),
+      buku: await booksRes.json(),
+      users: await usersRes.json(),
+      peminjaman: await loansRes.json(),
+      denda: await finesRes.json()
+    };
+
+    // Create CSV content
+    let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF";
+    
+    // Add buku data
+    csvContent += "=== DATA BUKU ===\n";
+    csvContent += "ID,Judul,Pengarang,Penerbit,Tahun,ISBN,Kategori,Stok\n";
+    data.buku.forEach(b => {
+      csvContent += `${b.id},"${b.judul}","${b.pengarang}","${b.penerbit}",${b.tahun},${b.isbn},"${b.kategori}",${b.stok}\n`;
+    });
+
+    csvContent += "\n=== DATA USERS ===\n";
+    csvContent += "ID,Nama,NIM,Username\n";
+    data.users.forEach(u => {
+      csvContent += `${u.id},"${u.nama}","${u.nim}","${u.username}"\n`;
+    });
+
+    csvContent += "\n=== DATA PEMINJAMAN ===\n";
+    csvContent += "ID,User,Buku,Tgl Pinjam,Tgl Kembali,Status\n";
+    data.peminjaman.forEach(p => {
+      csvContent += `${p.id},"${p.nama}","${p.judul}","${p.tgl_pinjam}","${p.tgl_kembali}","${p.status}"\n`;
+    });
+
+    csvContent += "\n=== DATA DENDA ===\n";
+    csvContent += "ID,User,Nominal,Alasan,Status\n";
+    data.denda.forEach(d => {
+      csvContent += `${d.id},"${d.nama}","${d.nominal}","${d.alasan}","${d.status}"\n`;
+    });
+
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `perpustakaan-export-${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showMessage('✅ Data berhasil diekspor ke CSV', 'success', 'reportsMessage');
+  } catch (error) {
+    console.error('Error exporting data:', error);
+    showMessage('❌ Gagal ekspor data: ' + error.message, 'error', 'reportsMessage');
+  }
+}
+
+// ===== INITIALIZATION =====
+window.addEventListener('load', () => {
+  if (checkAdminLogin()) {
+    loadDashboardData();
+  }
+});
+
+// Close modal when clicking outside
+window.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal')) {
+    e.target.classList.remove('show');
+  }
+});
+</script>
+
+</body>
+</html>

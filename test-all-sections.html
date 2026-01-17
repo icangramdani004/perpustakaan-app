@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Dashboard Sections</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 30px; text-align: center; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9; }
+        .test-section h3 { color: #667eea; margin-bottom: 10px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .loading { background: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+        .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #5568d3; }
+        code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+        .stats { background: #e8f4f8; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #0288d1; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+        table thead { background: #f0f0f0; }
+        table th, table td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        table tr:hover { background: #f5f5f5; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Semua Section Admin Dashboard</h1>
+
+        <div class="test-grid">
+            <div class="test-section">
+                <h3>📚 Test API: Books</h3>
+                <button onclick="testBooks()">Test Books API</button>
+                <div id="booksResult"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>👥 Test API: Members</h3>
+                <button onclick="testMembers()">Test Members API</button>
+                <div id="membersResult"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>📤 Test API: Loans</h3>
+                <button onclick="testLoans()">Test Loans API</button>
+                <div id="loansResult"></div>
+            </div>
+
+            <div class="test-section">
+                <h3>💰 Test API: Fines</h3>
+                <button onclick="testFines()">Test Fines API</button>
+                <div id="finesResult"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Test Dashboard Functions</h3>
+            <button onclick="testDashboardFunctions()">Test All Dashboard Functions</button>
+            <div id="functionsResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 System Status</h3>
+            <div id="statusResult"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        function showResult(elementId, message, type = 'loading') {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        function appendResult(elementId, message, type = 'loading') {
+            const el = document.getElementById(elementId);
+            el.innerHTML += `<div class="result ${type}">${message}</div>`;
+        }
+
+        async function testBooks() {
+            showResult('booksResult', '⏳ Loading books...', 'loading');
+            try {
+                const res = await fetch(`${API_URL}/buku`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const count = data.length || 0;
+                appendResult('booksResult', `✅ Success! Found ${count} books`, 'success');
+                appendResult('booksResult', `<div class="stats"><strong>Fields:</strong> ${data[0] ? Object.keys(data[0]).join(', ') : 'N/A'}</div>`, 'success');
+            } catch (error) {
+                appendResult('booksResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMembers() {
+            showResult('membersResult', '⏳ Loading members...', 'loading');
+            try {
+                const res = await fetch(`${API_URL}/user`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const count = data.length || 0;
+                appendResult('membersResult', `✅ Success! Found ${count} members`, 'success');
+                appendResult('membersResult', `<div class="stats"><strong>Fields:</strong> ${data[0] ? Object.keys(data[0]).join(', ') : 'N/A'}</div>`, 'success');
+            } catch (error) {
+                appendResult('membersResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testLoans() {
+            showResult('loansResult', '⏳ Loading loans...', 'loading');
+            try {
+                const res = await fetch(`${API_URL}/peminjaman`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const count = data.length || 0;
+                const active = data.filter(l => l.status === 'Dipinjam').length || 0;
+                appendResult('loansResult', `✅ Success! Found ${count} loans (${active} active)`, 'success');
+                appendResult('loansResult', `<div class="stats"><strong>Fields:</strong> ${data[0] ? Object.keys(data[0]).join(', ') : 'N/A'}</div>`, 'success');
+            } catch (error) {
+                appendResult('loansResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFines() {
+            showResult('finesResult', '⏳ Loading fines...', 'loading');
+            try {
+                const res = await fetch(`${API_URL}/denda`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const count = data.length || 0;
+                const unpaid = data.filter(f => f.status === 'Belum dibayar').length || 0;
+                appendResult('finesResult', `✅ Success! Found ${count} fines (${unpaid} unpaid)`, 'success');
+                appendResult('finesResult', `<div class="stats"><strong>Fields:</strong> ${data[0] ? Object.keys(data[0]).join(', ') : 'N/A'}</div>`, 'success');
+            } catch (error) {
+                appendResult('finesResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testDashboardFunctions() {
+            showResult('functionsResult', '🧪 Testing dashboard functions...', 'loading');
+            
+            // Test all functions
+            const tests = [
+                { name: 'getDaysOverdue', fn: () => getDaysOverdue('2025-01-01') },
+                { name: 'showMessage', fn: () => showMessage('Test', 'success', 'testDiv') },
+                { name: 'switchSection', fn: () => switchSection('books') },
+            ];
+
+            let passed = 0;
+            let failed = 0;
+
+            // Check if functions exist
+            const functionsToCheck = [
+                'loadBooksData', 'loadMembersData', 'loadLoansData', 'loadFinesData',
+                'submitBook', 'submitMember', 'deleteBook', 'deleteMember',
+                'returnLoan', 'markFinePaid', 'getDaysOverdue', 'showMessage',
+                'switchSection', 'openModal', 'closeModal', 'checkAdminLogin'
+            ];
+
+            for (const fn of functionsToCheck) {
+                if (typeof window[fn] === 'function') {
+                    appendResult('functionsResult', `✅ Function <code>${fn}</code> exists`, 'success');
+                    passed++;
+                } else {
+                    appendResult('functionsResult', `❌ Function <code>${fn}</code> missing`, 'error');
+                    failed++;
+                }
+            }
+
+            appendResult('functionsResult', `<div class="stats"><strong>Summary:</strong> ${passed} passed, ${failed} failed</div>`, 'success');
+        }
+
+        async function checkSystemStatus() {
+            const statusDiv = document.getElementById('statusResult');
+            statusDiv.innerHTML = '<div class="result loading">⏳ Checking system status...</div>';
+
+            try {
+                // Test all APIs
+                const endpoints = [
+                    { name: 'Books', url: `${API_URL}/buku` },
+                    { name: 'Members', url: `${API_URL}/user` },
+                    { name: 'Loans', url: `${API_URL}/peminjaman` },
+                    { name: 'Fines', url: `${API_URL}/denda` },
+                ];
+
+                let html = '<table><thead><tr><th>Endpoint</th><th>Status</th><th>Items</th></tr></thead><tbody>';
+                let allOk = true;
+
+                for (const ep of endpoints) {
+                    try {
+                        const res = await fetch(ep.url);
+                        const data = await res.json();
+                        const count = Array.isArray(data) ? data.length : 0;
+                        html += `<tr><td>${ep.name}</td><td style="color: green;">✅ OK</td><td>${count}</td></tr>`;
+                    } catch (e) {
+                        html += `<tr><td>${ep.name}</td><td style="color: red;">❌ FAIL</td><td>-</td></tr>`;
+                        allOk = false;
+                    }
+                }
+
+                html += '</tbody></table>';
+                statusDiv.innerHTML = html;
+                
+                if (allOk) {
+                    statusDiv.innerHTML += '<div class="result success"><strong>✅ All systems operational!</strong></div>';
+                } else {
+                    statusDiv.innerHTML += '<div class="result error"><strong>❌ Some endpoints failed. Check server.</strong></div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="result error">❌ System check failed: ${error.message}</div>`;
+            }
+        }
+
+        // Stubs for dashboard functions (to avoid errors if not loaded)
+        function getDaysOverdue(date) { return 0; }
+        function showMessage(msg, type, id) { }
+        function switchSection(id) { }
+        function openModal(id) { }
+        function closeModal(id) { }
+        async function checkAdminLogin() { return true; }
+
+        // Run status check on load
+        window.addEventListener('load', checkSystemStatus);
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard</title>
+<title>Dashboard - Perpustakaan Digital</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -20,16 +20,16 @@
     <div class="hamburger" onclick="toggleMenu()">☰</div>
 
     <div class="menu" id="menu">
-      <a href="dashboard.html" class="active">Dashboard</a>
-      <a href="katalog.html">Katalog</a>
-      <a href="pinjam.html">Peminjaman</a>
-      <a href="riwayat.html">Riwayat</a>
-      <a href="denda.html">Denda</a>
-      <a href="anggota.html">Anggota</a>
-      <a href="notifikasi.html">Notifikasi</a>
-      <a href="laporan.html">Laporan</a>
-      <a href="tentang.html">Tentang</a>
-      <a href="#" onclick="logout()">Logout</a>
+      <a href="dashboard.html" class="active">📊 Dashboard</a>
+      <a href="katalog.html">📚 Katalog</a>
+      <a href="pinjam.html">📤 Peminjaman</a>
+      <a href="riwayat.html">📋 Riwayat</a>
+      <a href="denda.html">⚠️ Denda</a>
+      <a href="anggota.html">👥 Anggota</a>
+      <a href="notifikasi.html">🔔 Notifikasi</a>
+      <a href="laporan.html">📈 Laporan</a>
+      <a href="tentang.html">ℹ️ Tentang</a>
+      <a href="#" onclick="logout()" class="logout-link">🚪 Logout</a>
     </div>
   </div>
 </div>
@@ -37,31 +37,194 @@
 <!-- CONTENT -->
 <main class="container">
 
-  <h2 class="page-title">Dashboard</h2>
+  <div class="page-title">📊 Dashboard</div>
 
+  <!-- Welcome Message -->
+  <div class="alert alert-info">
+    <span>👋</span> Selamat datang! Berikut adalah ringkasan perpustakaan Anda hari ini.
+  </div>
+
+  <!-- Main Statistics -->
   <div class="cards">
     <div class="card">
+      <div class="card-icon">📚</div>
       <h3>Total Buku</h3>
-      <p>120</p>
+      <p id="totalBukuCard">0</p>
     </div>
 
-    <div class="card">
-      <h3>Dipinjam</h3>
-      <p>35</p>
+    <div class="card success">
+      <div class="card-icon">✅</div>
+      <h3>Stok Tersedia</h3>
+      <p id="bukuTersediaCard">0</p>
     </div>
 
-    <div class="card">
-      <h3>Anggota</h3>
-      <p>80</p>
+    <div class="card warning">
+      <div class="card-icon">📤</div>
+      <h3>Buku Dipinjam</h3>
+      <p id="bukuDipinjamCard">0</p>
+    </div>
+
+    <div class="card danger">
+      <div class="card-icon">⚠️</div>
+      <h3>Denda Menunggu</h3>
+      <p id="dendaCard">0</p>
+    </div>
+  </div>
+
+  <!-- Recent Activity Section -->
+  <div class="grid-2col">
+    <!-- Recent Loans -->
+    <div class="info-box">
+      <h3>📋 Peminjaman Terakhir</h3>
+      <div id="recentLoans" class="info-content">
+        <p class="loading-text">Memuat data...</p>
+      </div>
+    </div>
+
+    <!-- Popular Books -->
+    <div class="info-box">
+      <h3>🏆 Buku Populer</h3>
+      <div id="popularBooks" class="info-content">
+        <p class="loading-text">Memuat data...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="info-box">
+    <h3>⚡ Aksi Cepat</h3>
+    <div class="quick-actions">
+      <a href="katalog.html" class="btn btn-primary action-text">📚 Jelajahi Katalog</a>
+      <a href="pinjam.html" class="btn btn-primary action-text">📤 Pinjam Buku</a>
+      <a href="riwayat.html" class="btn btn-primary action-text">📋 Lihat Riwayat</a>
+      <a href="denda.html" class="btn btn-warning action-text">⚠️ Cek Denda</a>
+    </div>
+  </div>
+
+  <!-- Statistics Chart (Text-based) -->
+  <div class="info-box">
+    <h3>📈 Statistik Kategori</h3>
+    <div id="categoryStats">
+      <p class="loading-text">Memuat data...</p>
     </div>
   </div>
 
 </main>
 
 <footer>
-  © 2025 Perpustakaan Kampus
+  <p>© 2026 Perpustakaan Digital - Semua Hak Dilindungi</p>
+  <p class="footer-text">Dibuat dengan ❤️ untuk memudahkan akses literatur</p>
 </footer>
 
+<script src="api.js"></script>
 <script src="script.js"></script>
+</body>
+</html>
+<script>
+  async function loadDashboard() {
+    try {
+      const userId = localStorage.getItem('user_id');
+      
+      // Load books
+      const bukuResponse = await fetch('http://localhost:3000/api/buku');
+      if (!bukuResponse.ok) throw new Error('Gagal load buku');
+      const buku_list = await bukuResponse.json();
+      
+      // Load user peminjaman
+      let bukuDipinjamCount = 0;
+      let recentLoans = [];
+      try {
+        const peminjamanResponse = await fetch('http://localhost:3000/api/peminjaman');
+        if (peminjamanResponse.ok) {
+          const allLoans = await peminjamanResponse.json();
+          recentLoans = allLoans.filter(p => p.status === 'Dipinjam').slice(0, 5);
+          bukuDipinjamCount = allLoans.filter(p => p.status === 'Dipinjam').length;
+        }
+      } catch (e) {
+        console.error('Error loading loans:', e);
+      }
+      
+      // Load fines
+      let totalDenda = 0;
+      try {
+        const dendaResponse = await fetch('http://localhost:3000/api/denda');
+        if (dendaResponse.ok) {
+          const allFines = await dendaResponse.json();
+          totalDenda = allFines
+            .filter(d => d.status === 'Belum dibayar')
+            .reduce((sum, d) => sum + (d.nominal || 0), 0);
+        }
+      } catch (e) {
+        console.error('Error loading fines:', e);
+      }
+      
+      // Calculate statistics
+      const totalStok = buku_list.reduce((sum, b) => sum + b.stok, 0);
+      const bukuTersedia = buku_list.filter(b => b.stok > 0).length;
+      const totalBuku = buku_list.length;
+      
+      // Update main cards
+      document.getElementById('totalBukuCard').textContent = totalBuku;
+      document.getElementById('bukuTersediaCard').textContent = bukuTersedia;
+      document.getElementById('bukuDipinjamCard').textContent = bukuDipinjamCount;
+      document.getElementById('dendaCard').textContent = 'Rp ' + totalDenda.toLocaleString('id-ID');
+      
+      // Display popular books
+      const popular = buku_list.sort((a, b) => (b.stok || 0) - (a.stok || 0)).slice(0, 5);
+      document.getElementById('popularBooks').innerHTML = popular.map(b => `
+        <div style="padding: 12px; border-bottom: 1px solid #eee;">
+          <div style="font-weight: 600; color: #0b3c5d; font-size: 14px;">${b.judul}</div>
+          <div style="font-size: 12px; color: #666; margin-top: 4px;">Pengarang: ${b.pengarang}</div>
+          <div style="font-size: 12px; color: #666;">Stok: ${b.stok}</div>
+        </div>
+      `).join('');
+      
+      // Category statistics
+      const categories = {};
+      buku_list.forEach(b => {
+        categories[b.kategori] = (categories[b.kategori] || 0) + 1;
+      });
+      
+      const categoryHTML = Object.entries(categories).map(([cat, count]) => {
+        const percentage = Math.round((count / totalBuku) * 100);
+        return `
+          <div style="margin-bottom: 16px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-weight: 600; color: #0b3c5d;">${cat}</span>
+              <span style="font-size: 14px; color: #666;">${count} buku (${percentage}%)</span>
+            </div>
+            <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+              <div style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); height: 100%; width: ${percentage}%; transition: width 0.3s;"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      document.getElementById('categoryStats').innerHTML = categoryHTML || '<p style="text-align: center; color: #999;">Tidak ada data kategori</p>';
+      
+      // Recent loans from API
+      document.getElementById('recentLoans').innerHTML = recentLoans.length > 0 
+        ? recentLoans.map(loan => `
+            <div style="padding: 12px; border-bottom: 1px solid #eee;">
+              <div style="font-weight: 600; color: #0b3c5d; font-size: 14px;">Buku ID: ${loan.buku_id}</div>
+              <div style="font-size: 12px; color: #666; margin-top: 4px;">Dipinjam: ${new Date(loan.tgl_pinjam).toLocaleDateString('id-ID')}</div>
+              <div style="font-size: 12px; color: #666;">Kembali: ${new Date(loan.tgl_kembali).toLocaleDateString('id-ID')}</div>
+              <div style="font-size: 12px; color: #4CAF50; margin-top: 4px;">Status: ${loan.status}</div>
+            </div>
+          `).join('')
+        : '<p style="text-align: center; color: #999; padding: 20px;">Belum ada peminjaman aktif</p>';
+        
+    } catch (error) {
+      console.error('Error:', error);
+      document.querySelector('.container').innerHTML = `
+        <div class="alert alert-danger">
+          ⚠️ Gagal memuat dashboard. Pastikan backend running di http://localhost:3000
+        </div>
+      `;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
 </body>
 </html>

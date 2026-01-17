@@ -1,43 +1,529 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Denda</title>
+<title>Denda - Perpustakaan Digital</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  .payment-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+  }
+
+  .modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .close:hover {
+    color: black;
+  }
+
+  .payment-method {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+  }
+
+  .method-btn {
+    flex: 1;
+    padding: 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .method-btn:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+  }
+
+  .method-btn.selected {
+    border-color: #667eea;
+    background: #667eea;
+    color: white;
+  }
+
+  .method-btn .icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .method-btn .label {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .transfer-info {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border-left: 4px solid #667eea;
+  }
+
+  .transfer-info h4 {
+    margin: 0 0 10px 0;
+    color: #0b3c5d;
+  }
+
+  .transfer-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .transfer-info .bank-account {
+    background: white;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-weight: 600;
+    font-family: monospace;
+    color: #667eea;
+    word-break: break-all;
+  }
+
+  .confirmation-form {
+    margin: 20px 0;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #0b3c5d;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .btn-confirm {
+    flex: 1;
+    padding: 12px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .btn-confirm:hover {
+    background: #229954;
+  }
+
+  .btn-cancel {
+    flex: 1;
+    padding: 12px;
+    background: #999;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .btn-cancel:hover {
+    background: #777;
+  }
+
+  .success-message {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 15px 0;
+    display: none;
+  }
+
+  .info-box {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 15px 0;
+    color: #856404;
+  }
+</style>
 </head>
-<body onload="checkLogin()">
+<body onload="checkLogin(); loadDendaUser()">
 
 <div class="navbar">
   <div class="nav-wrap">
     <div class="brand">
-      <img src="assets/logo-mandala.jpg">
+      <img src="assets/logo-mandala.jpg" alt="Logo">
       <span class="brand-title">Perpustakaan Digital</span>
     </div>
     <div class="hamburger" onclick="toggleMenu()">☰</div>
     <div class="menu" id="menu">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="katalog.html">Katalog</a>
-      <a href="pinjam.html">Peminjaman</a>
-      <a href="riwayat.html">Riwayat</a>
-      <a href="denda.html" class="active">Denda</a>
-      <a href="anggota.html">Anggota</a>
-      <a href="notifikasi.html">Notifikasi</a>
-      <a href="laporan.html">Laporan</a>
-      <a href="tentang.html">Tentang</a>
-      <a href="#" onclick="logout()">Logout</a>
+      <a href="dashboard.html">📊 Dashboard</a>
+      <a href="katalog.html">📚 Katalog</a>
+      <a href="pinjam.html">📤 Peminjaman</a>
+      <a href="riwayat.html">📋 Riwayat</a>
+      <a href="denda.html" class="active">⚠️ Denda</a>
+      <a href="anggota.html">👥 Anggota</a>
+      <a href="notifikasi.html">🔔 Notifikasi</a>
+      <a href="laporan.html">📈 Laporan</a>
+      <a href="tentang.html">ℹ️ Tentang</a>
+      <a href="#" onclick="logout()" style="color: #ffcccc;">🚪 Logout</a>
     </div>
   </div>
 </div>
 
 <div class="container">
-  <div class="page-title">Informasi Denda</div>
-  <div class="card">
-    <p>Denda keterlambatan pengembalian buku adalah <strong>Rp500 / hari</strong>.</p>
+  <div class="page-title">⚠️ Informasi Denda</div>
+  
+  <!-- Denda Info -->
+  <div class="info-box">
+    <h3 style="margin-top: 0;">📋 Ketentuan Denda</h3>
+    <p style="margin: 10px 0;">Denda keterlambatan pengembalian buku adalah <strong>Rp500 / hari</strong>.</p>
+  </div>
+
+  <!-- Denda Summary -->
+  <div class="cards" style="margin-bottom: 24px;">
+    <div class="card danger">
+      <div class="card-icon">💰</div>
+      <h3>Total Denda Belum Bayar</h3>
+      <p id="totalDenda">Rp 0</p>
+    </div>
+    <div class="card warning">
+      <div class="card-icon">⏰</div>
+      <h3>Peminjaman Telat</h3>
+      <p id="countTelat">0</p>
+    </div>
+  </div>
+
+  <!-- Denda List -->
+  <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 24px;">
+    <h3>📌 Riwayat Denda Anda</h3>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">No</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Peminjaman ID</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Nominal Denda</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Status</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Metode</th>
+            <th style="padding: 12px; text-align: left; color: #0b3c5d; font-weight: 600;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="dendaBody">
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 20px; color: #999;">Memuat data...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<footer>© 2025 Perpustakaan Kampus</footer>
+<!-- Payment Modal -->
+<div id="paymentModal" class="payment-modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePaymentModal()">&times;</span>
+    <h2 id="modalTitle">Pembayaran Denda</h2>
+    
+    <div class="success-message" id="successMsg">
+      ✅ Pembayaran berhasil dicatat! Terima kasih.
+    </div>
+
+    <div id="paymentContent">
+      <p style="color: #666;">Nominal denda yang harus dibayar: <strong id="modalAmount">Rp 0</strong></p>
+
+      <h3 style="margin-top: 20px; color: #0b3c5d;">Pilih Metode Pembayaran:</h3>
+      <div class="payment-method">
+        <div class="method-btn" onclick="selectPaymentMethod('langsung')" id="btn-langsung">
+          <div class="icon">💵</div>
+          <div class="label">Langsung</div>
+        </div>
+        <div class="method-btn" onclick="selectPaymentMethod('transfer')" id="btn-transfer">
+          <div class="icon">💳</div>
+          <div class="label">Transfer Bank</div>
+        </div>
+      </div>
+
+      <!-- Langsung Payment Section -->
+      <div id="langsungSection" style="display: none;">
+        <div class="info-box">
+          <h4>Pembayaran Langsung</h4>
+          <p>Silakan datang ke loket perpustakaan untuk melakukan pembayaran tunai.</p>
+          <p><strong>Jam Operasional:</strong> Senin - Jumat: 08:00 - 17:00</p>
+          <p><strong>Lokasi:</strong> Gedung Perpustakaan Lantai 1</p>
+        </div>
+        <div class="confirmation-form">
+          <div class="form-group">
+            <label>Nama Pembayar:</label>
+            <input type="text" id="namaLangsung" placeholder="Masukkan nama Anda" value="">
+          </div>
+          <div class="form-group">
+            <label>Catatan / Bukti:</label>
+            <textarea id="catatanLangsung" placeholder="Catatan pembayaran (opsional)" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transfer Payment Section -->
+      <div id="transferSection" style="display: none;">
+        <div class="transfer-info">
+          <h4>Detail Transfer Bank</h4>
+          <p><strong>Nama Rekening:</strong> Perpustakaan Digital Kampus</p>
+          <p><strong>Bank:</strong> BCA</p>
+          <div class="bank-account">3270123456</div>
+          <p style="font-size: 12px; color: #666;">Gunakan format: DENDA[ID_DENDA] sebagai keterangan transfer</p>
+        </div>
+        <div class="confirmation-form">
+          <div class="form-group">
+            <label>Nama Pengirim:</label>
+            <input type="text" id="namaPengirim" placeholder="Nama sesuai rekening pengirim" value="">
+          </div>
+          <div class="form-group">
+            <label>Nomor Referensi Transfer:</label>
+            <input type="text" id="nomorReferensi" placeholder="Nomor referensi atau No. Transaksi" value="">
+          </div>
+          <div class="form-group">
+            <label>Tanggal Transfer:</label>
+            <input type="date" id="tanggalTransfer" value="">
+          </div>
+          <div class="form-group">
+            <label>Bukti / Catatan:</label>
+            <textarea id="catatanTransfer" placeholder="Masukkan nomor mutasi atau catatan tambahan" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-confirm" onclick="confirmPayment()">✓ Konfirmasi Pembayaran</button>
+        <button class="btn-cancel" onclick="closePaymentModal()">✗ Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 Perpustakaan Digital - Semua Hak Dilindungi</p>
+  <p style="font-size: 12px; opacity: 0.8;">Dibuat dengan ❤️ untuk memudahkan akses literatur</p>
+</footer>
+<script src="api.js"></script>
 <script src="script.js"></script>
+<script>
+let currentPaymentData = {
+  dendaId: null,
+  nominal: 0,
+  method: null
+};
+
+async function loadDendaUser() {
+  try {
+    const userId = parseInt(localStorage.getItem('user_id'));
+    const response = await fetch('http://localhost:3000/api/denda');
+    if (!response.ok) throw new Error('Gagal load denda');
+    
+    const allFines = await response.json();
+    const userDenda = allFines;
+    
+    const tbody = document.getElementById('dendaBody');
+    tbody.innerHTML = '';
+
+    if (userDenda.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">Tidak ada denda</td></tr>';
+      document.getElementById('totalDenda').textContent = 'Rp 0';
+      document.getElementById('countTelat').textContent = '0';
+      return;
+    }
+
+    const totalDenda = userDenda
+      .filter(d => d.status === 'Belum dibayar')
+      .reduce((sum, d) => sum + (d.nominal || 0), 0);
+    const countTelat = userDenda.filter(d => d.status === 'Belum dibayar').length;
+
+    document.getElementById('totalDenda').textContent = 'Rp ' + totalDenda.toLocaleString('id-ID');
+    document.getElementById('countTelat').textContent = countTelat;
+
+    userDenda.forEach((denda, idx) => {
+      const statusColor = denda.status === 'Dibayar' ? '#d4edda' : '#f8d7da';
+      const methodDisplay = denda.metode_bayar ? denda.metode_bayar : '-';
+      const row = tbody.insertRow();
+      row.innerHTML = `
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">${idx + 1}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">ID: ${denda.peminjaman_id}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">Rp ${denda.nominal.toLocaleString('id-ID')}</td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+          <span style="background: ${statusColor}; padding: 4px 8px; border-radius: 3px; font-size: 12px; color: ${denda.status === 'Dibayar' ? '#155724' : '#721c24'};">
+            ${denda.status}
+          </span>
+        </td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+          <small>${methodDisplay}</small>
+        </td>
+        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+          ${denda.status === 'Belum dibayar' ? `<button onclick="openPaymentModal(${denda.id}, ${denda.nominal})" style="background: #27ae60; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">Bayar</button>` : '-'}
+        </td>
+      `;
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    document.getElementById('dendaBody').innerHTML = `<tr><td colspan="6" style="padding: 20px; color: #d9534f;">Error: ${error.message}</td></tr>`;
+  }
+}
+
+function openPaymentModal(dendaId, nominal) {
+  currentPaymentData = {
+    dendaId: dendaId,
+    nominal: nominal,
+    method: null
+  };
+  
+  document.getElementById('paymentModal').style.display = 'block';
+  document.getElementById('paymentContent').style.display = 'block';
+  document.getElementById('successMsg').style.display = 'none';
+  document.getElementById('modalAmount').textContent = 'Rp ' + nominal.toLocaleString('id-ID');
+  document.getElementById('namaLangsung').value = localStorage.getItem('nama') || '';
+  document.getElementById('namaPengirim').value = localStorage.getItem('nama') || '';
+  document.getElementById('tanggalTransfer').valueAsDate = new Date();
+  
+  // Reset method selection
+  document.getElementById('btn-langsung').classList.remove('selected');
+  document.getElementById('btn-transfer').classList.remove('selected');
+  document.getElementById('langsungSection').style.display = 'none';
+  document.getElementById('transferSection').style.display = 'none';
+}
+
+function closePaymentModal() {
+  document.getElementById('paymentModal').style.display = 'none';
+}
+
+function selectPaymentMethod(method) {
+  currentPaymentData.method = method;
+  
+  document.getElementById('btn-langsung').classList.remove('selected');
+  document.getElementById('btn-transfer').classList.remove('selected');
+  document.getElementById('langsungSection').style.display = 'none';
+  document.getElementById('transferSection').style.display = 'none';
+  
+  if (method === 'langsung') {
+    document.getElementById('btn-langsung').classList.add('selected');
+    document.getElementById('langsungSection').style.display = 'block';
+  } else if (method === 'transfer') {
+    document.getElementById('btn-transfer').classList.add('selected');
+    document.getElementById('transferSection').style.display = 'block';
+  }
+}
+
+async function confirmPayment() {
+  if (!currentPaymentData.method) {
+    alert('Silakan pilih metode pembayaran terlebih dahulu!');
+    return;
+  }
+
+  let paymentInfo = '';
+  if (currentPaymentData.method === 'langsung') {
+    const nama = document.getElementById('namaLangsung').value.trim();
+    const catatan = document.getElementById('catatanLangsung').value.trim();
+    
+    if (!nama) {
+      alert('Silakan masukkan nama pembayar!');
+      return;
+    }
+    
+    paymentInfo = `Pembayaran Langsung - Nama: ${nama} - Catatan: ${catatan}`;
+  } else if (currentPaymentData.method === 'transfer') {
+    const nama = document.getElementById('namaPengirim').value.trim();
+    const nomor = document.getElementById('nomorReferensi').value.trim();
+    const tanggal = document.getElementById('tanggalTransfer').value;
+    const catatan = document.getElementById('catatanTransfer').value.trim();
+    
+    if (!nama || !nomor || !tanggal) {
+      alert('Silakan isi semua data transfer yang diperlukan!');
+      return;
+    }
+    
+    paymentInfo = `Transfer Bank - Nama: ${nama} - No. Ref: ${nomor} - Tanggal: ${tanggal}`;
+  }
+
+  try {
+    const response = await fetch(`http://localhost:3000/api/denda/${currentPaymentData.dendaId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        status: 'Dibayar',
+        metode_bayar: currentPaymentData.method,
+        keterangan_bayar: paymentInfo
+      })
+    });
+
+    if (!response.ok) throw new Error('Gagal memproses pembayaran');
+
+    document.getElementById('paymentContent').style.display = 'none';
+    document.getElementById('successMsg').style.display = 'block';
+    
+    setTimeout(() => {
+      closePaymentModal();
+      loadDendaUser();
+    }, 2000);
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error: ' + error.message);
+  }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+  const modal = document.getElementById('paymentModal');
+  if (event.target == modal) {
+    modal.style.display = 'none';
+  }
+}
+</script>
 </body>
 </html>

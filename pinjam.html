@@ -33,16 +33,218 @@
 <div class="container">
   <div class="page-title">Form Peminjaman Buku</div>
 
-  <div class="form">
-    <input placeholder="Nama Peminjam">
-    <input placeholder="NIM">
-    <input placeholder="Judul Buku">
-    <input type="date">
-    <button>Simpan Peminjaman</button>
+  <div class="form" style="background: white; padding: 20px; border-radius: 8px; max-width: 600px; margin: 20px auto;">
+    <h3>Ajukan Peminjaman</h3>
+    <div id="msgPinjam"></div>
+    <form onsubmit="submitPeminjaman(event)">
+      <div class="form-group">
+        <label>Pilih Buku *</label>
+        <select id="bukuSelect" required>
+          <option value="">- Pilih Buku -</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tanggal Pinjam *</label>
+        <input type="date" id="tglPinjam" required>
+      </div>
+      <div class="form-group">
+        <label>Tanggal Kembali *</label>
+        <input type="date" id="tglKembali" required>
+      </div>
+      <div class="form-group">
+        <label>Keterangan (opsional)</label>
+        <textarea id="keterangan" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 60px;"></textarea>
+      </div>
+      <button type="submit" style="background: #328cc1; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%;">Ajukan Peminjaman</button>
+    </form>
+  </div>
+
+  <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px auto; max-width: 100%;">
+    <h3>Riwayat Peminjaman Anda</h3>
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #328cc1; color: white;">
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">No</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Buku</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Tgl Pinjam</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Tgl Kembali</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Status</th>
+            <th style="padding: 12px; text-align: left; border: 1px solid #ddd;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="peminjamanBody">
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 20px; color: #999;">Belum ada riwayat peminjaman</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <footer>© 2025 Perpustakaan Kampus</footer>
+<script src="api.js"></script>
 <script src="script.js"></script>
+<script>
+async function loadBukuSelect() {
+  try {
+    const response = await fetch('http://localhost:3000/api/buku');
+    if (!response.ok) throw new Error('Gagal load buku');
+    
+    const buku_list = await response.json();
+    const select = document.getElementById('bukuSelect');
+    select.innerHTML = '<option value="">- Pilih Buku -</option>';
+    
+    buku_list.filter(b => b.stok > 0).forEach(buku => {
+      const option = document.createElement('option');
+      option.value = buku.id;
+      option.textContent = `${buku.judul} (${buku.pengarang}) - Stok: ${buku.stok}`;
+      select.appendChild(option);
+    });
+
+    // Set tanggal hari ini
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('tglPinjam').value = today;
+    
+    // Set tanggal kembali 7 hari mendatang
+    const kembali = new Date();
+    kembali.setDate(kembali.getDate() + 7);
+    document.getElementById('tglKembali').value = kembali.toISOString().split('T')[0];
+  } catch (error) {
+    console.error('Error:', error);
+    showAlert('Gagal memuat daftar buku', 'danger', 'msgPinjam');
+  }
+}
+
+async function submitPeminjaman(e) {
+  e.preventDefault();
+  
+  const bukuId = parseInt(document.getElementById('bukuSelect').value);
+  const tglPinjam = document.getElementById('tglPinjam').value;
+  const tglKembali = document.getElementById('tglKembali').value;
+  const keterangan = document.getElementById('keterangan').value;
+  const userId = parseInt(localStorage.getItem('user_id'));
+
+  if (!bukuId || !tglPinjam || !tglKembali) {
+    showAlert('Lengkapi data peminjaman!', 'danger', 'msgPinjam');
+    return;
+  }
+
+  // Validasi tanggal
+  if (new Date(tglKembali) <= new Date(tglPinjam)) {
+    showAlert('Tanggal kembali harus lebih besar dari tanggal pinjam!', 'danger', 'msgPinjam');
+    return;
+  }
+
+  try {
+    const response = await fetch('http://localhost:3000/api/peminjaman', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        buku_id: bukuId,
+        tgl_pinjam: tglPinjam,
+        tgl_kembali: tglKembali,
+        status: 'Dipinjam'
+      })
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      showAlert(data.error || 'Gagal membuat peminjaman', 'danger', 'msgPinjam');
+      return;
+    }
+
+    showAlert('Peminjaman berhasil! Silakan ambil buku ke meja perpustakaan', 'success', 'msgPinjam');
+    document.querySelector('form').reset();
+    loadBukuSelect();
+    loadPeminjamanUser();
+  } catch (error) {
+    console.error('Error:', error);
+    showAlert('Error: ' + error.message, 'danger', 'msgPinjam');
+  }
+}
+
+async function loadPeminjamanUser() {
+  try {
+    const userId = parseInt(localStorage.getItem('user_id'));
+    const response = await fetch('http://localhost:3000/api/peminjaman');
+    if (!response.ok) throw new Error('Gagal load peminjaman');
+    
+    const allLoans = await response.json();
+    const userPeminjaman = allLoans.filter(p => p.user_id === userId);
+    
+    const tbody = document.getElementById('peminjamanBody');
+    tbody.innerHTML = '';
+
+    if (userPeminjaman.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 20px; color: #999;">Belum ada riwayat peminjaman</td></tr>';
+      return;
+    }
+
+    userPeminjaman.forEach((p, idx) => {
+      const statusColor = p.status === 'Kembali' ? '#d4edda' : '#fff3cd';
+      const row = tbody.insertRow();
+      row.innerHTML = `
+        <td style="padding: 12px; border: 1px solid #ddd;">${idx + 1}</td>
+        <td style="padding: 12px; border: 1px solid #ddd;">Buku ID: ${p.buku_id}</td>
+        <td style="padding: 12px; border: 1px solid #ddd;">${new Date(p.tgl_pinjam).toLocaleDateString('id-ID')}</td>
+        <td style="padding: 12px; border: 1px solid #ddd;">${new Date(p.tgl_kembali).toLocaleDateString('id-ID')}</td>
+        <td style="padding: 12px; border: 1px solid #ddd;"><span style="background: ${statusColor}; padding: 4px 8px; border-radius: 3px; font-size: 12px;">${p.status}</span></td>
+        <td style="padding: 12px; border: 1px solid #ddd;">
+          ${p.status === 'Dipinjam' ? `<button onclick="kembalikanBuku(${p.id})" style="background: #27ae60; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">Kembalikan</button>` : '-'}
+        </td>
+      `;
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    showAlert('Gagal memuat peminjaman', 'danger', 'msgPinjam');
+  }
+}
+
+async function kembalikanBuku(peminjamanId) {
+  if (confirm('Konfirmasi pengembalian buku?')) {
+    try {
+      const response = await fetch(`http://localhost:3000/api/peminjaman/${peminjamanId}/return`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        showAlert(data.error || 'Gagal mengembalikan buku', 'danger', 'msgPinjam');
+        return;
+      }
+
+      showAlert('Terima kasih! Pengembalian buku berhasil dicatat', 'success', 'msgPinjam');
+      loadPeminjamanUser();
+    } catch (error) {
+      console.error('Error:', error);
+      showAlert('Error: ' + error.message, 'danger', 'msgPinjam');
+    }
+  }
+}
+
+function showAlert(msg, type, elementId) {
+  const box = document.getElementById(elementId);
+  const div = document.createElement('div');
+  div.style.cssText = `padding: 15px; margin-bottom: 15px; border-radius: 5px; border-left: 4px solid; background: ${type === 'success' ? '#d4edda' : '#f8d7da'}; color: ${type === 'success' ? '#155724' : '#721c24'}; border-left-color: ${type === 'success' ? '#28a745' : '#dc3545'};`;
+  div.textContent = msg;
+  box.innerHTML = '';
+  box.appendChild(div);
+  
+  setTimeout(() => {
+    box.innerHTML = '';
+  }, 4000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  loadBukuSelect();
+  loadPeminjamanUser();
+});
+</script>
 </body>
 </html>

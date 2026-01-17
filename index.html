@@ -1,42 +1,248 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Perpustakaan Digital</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="body-flex-col">
 
 <div class="navbar">
   <div class="nav-wrap">
     <div class="brand">
-      <img src="assets/logo-mandala.jpg">
+      <img src="assets/logo-mandala.jpg" alt="Logo">
       <span class="brand-title">Perpustakaan Digital</span>
     </div>
   </div>
 </div>
 
-<section class="hero">
+<section class="hero hero-flex">
   <div class="hero-content">
     <div class="hero-text">
-      <h1>Perpustakaan Digital Kampus</h1>
-      <p>Sistem informasi perpustakaan untuk mendukung layanan akademik.</p>
+      <h1>📚 Perpustakaan Digital Kampus</h1>
+      <p>Akses ribuan koleksi buku dan literatur akademik dengan mudah. Sistem manajemen perpustakaan yang modern dan user-friendly untuk mendukung pembelajaran Anda.</p>
+      
+      <div class="hero-stats-row">
+        <div class="hero-stat">
+          <span class="hero-stat-icon">📚</span>
+          <div>
+            <div class="hero-stat-value">500+</div>
+            <div class="hero-stat-label">Koleksi Buku</div>
+          </div>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-icon">👥</span>
+          <div>
+            <div class="hero-stat-value">1000+</div>
+            <div class="hero-stat-label">Member Aktif</div>
+          </div>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-icon">⚡</span>
+          <div>
+            <div class="hero-stat-value">24/7</div>
+            <div class="hero-stat-label">Online Access</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="auth-card">
-      <h2>Login</h2>
-      <input id="username" placeholder="Username">
-      <input id="password" type="password" placeholder="Password">
-      <button onclick="login()">Masuk</button>
-      <p style="margin-top:10px;text-align:center">
-        Belum punya akun? <a href="register.html">Daftar</a>
-      </p>
+      <div class="login-text-center">
+        <span class="login-icon">🔐</span>
+        <h2 class="login-title">Login Member</h2>
+        <p class="login-subtitle">Masuk ke akun Anda untuk mengakses katalog buku</p>
+      </div>
+
+      <div id="loginMessage"></div>
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" placeholder="Masukkan username Anda" type="text">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="Masukkan password Anda">
+      </div>
+
+      <button id="loginBtn" class="login-btn">🚀 Masuk Sekarang</button>
+
+      <hr class="login-divider">
+
+      <div class="login-link-section">
+        <p class="login-link-text">
+          Belum punya akun? <a href="register.html" class="login-link">Daftar sekarang</a>
+        </p>
+      </div>
+
+      <a href="admin-login-bersih.html" class="admin-link">
+        🔐 Login Admin
+      </a>
+
+
     </div>
   </div>
 </section>
 
-<footer>© 2025 Perpustakaan Kampus</footer>
-<script src="script.js"></script>
+<footer>
+  <p>© 2026 Perpustakaan Digital - Semua Hak Dilindungi</p>
+  <p class="footer-text">Platform manajemen perpustakaan modern untuk institusi akademik</p>
+</footer>
+
+<script>
+const API_URL = 'http://localhost:3000/api';
+
+// ===== NOTIFICATION SYSTEM =====
+function showNotification(message, type = 'info') {
+  const container = document.getElementById('loginMessage');
+  const div = document.createElement('div');
+  
+  const colors = {
+    success: '#d4edda #155724 #c3e6cb',
+    error: '#f8d7da #721c24 #f5c6cb',
+    warning: '#fff3cd #856404 #ffeaa7',
+    info: '#d1ecf1 #0c5460 #bee5eb'
+  };
+
+  const [bg, text, border] = colors[type].split(' ');
+  
+  div.style.cssText = `
+    background: ${bg};
+    color: ${text};
+    padding: 12px 16px;
+    border-radius: 5px;
+    border-left: 4px solid ${border};
+    margin-bottom: 15px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+  `;
+  
+  div.textContent = message;
+  container.innerHTML = '';
+  container.appendChild(div);
+  
+  setTimeout(() => {
+    div.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => container.innerHTML = '', 300);
+  }, 4000);
+}
+
+// ===== LOGIN FUNCTION =====
+async function memberLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+
+  if (!username || !password) {
+    showNotification('Username dan password harus diisi!', 'warning');
+    return;
+  }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Sedang login...';
+
+  try {
+    const response = await fetch(`${API_URL}/user/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      showNotification(result.error || 'Login gagal', 'error');
+      btn.disabled = false;
+      btn.textContent = '🚀 Masuk Sekarang';
+      return;
+    }
+
+    // Success
+    const user = result.data;
+    localStorage.setItem('login', 'true');
+    localStorage.setItem('user_id', user.id);
+    localStorage.setItem('username', user.username);
+    localStorage.setItem('nama', user.nama);
+    localStorage.setItem('nim', user.nim);
+    localStorage.setItem('user', JSON.stringify(user));
+    
+    showNotification(`✅ Selamat datang, ${user.nama}!`, 'success');
+    
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 1500);
+  } catch (error) {
+    console.error('Login error:', error);
+    showNotification('Koneksi server gagal. Pastikan backend running.', 'error');
+    btn.disabled = false;
+    btn.textContent = '🚀 Masuk Sekarang';
+  }
+}
+
+// ===== EVENT LISTENERS =====
+document.addEventListener('DOMContentLoaded', function() {
+  const loginBtn = document.getElementById('loginBtn');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+
+  // Button click
+  loginBtn.addEventListener('click', memberLogin);
+
+  // Enter key
+  usernameInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') memberLogin();
+  });
+  passwordInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') memberLogin();
+  });
+
+  // Focus effects
+  usernameInput.addEventListener('focus', function() {
+    this.style.borderColor = '#328cc1';
+  });
+  usernameInput.addEventListener('blur', function() {
+    this.style.borderColor = '#ddd';
+  });
+  passwordInput.addEventListener('focus', function() {
+    this.style.borderColor = '#328cc1';
+  });
+  passwordInput.addEventListener('blur', function() {
+    this.style.borderColor = '#ddd';
+  });
+});
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slideOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+document.head.appendChild(style);
+</script>
+
 </body>
 </html>

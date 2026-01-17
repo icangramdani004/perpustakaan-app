@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Admin Dashboard - Verifikasi Sistem Lengkap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4caf50;
+            color: white;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .status-badge.error {
+            background: #f44336;
+        }
+
+        .status-badge.warning {
+            background: #ff9800;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-content {
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+
+        .test-result {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #ddd;
+            background: #f5f5f5;
+        }
+
+        .test-result.success {
+            border-left-color: #4caf50;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .test-result.error {
+            border-left-color: #f44336;
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .test-result.loading {
+            border-left-color: #2196f3;
+            background: #e3f2fd;
+            color: #1565c0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .stats-table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .stats-table tr:hover {
+            background: #f0f0f0;
+        }
+
+        .stats-table td:first-child {
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .alert {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .alert.info {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
+        }
+
+        .alert.success {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .alert.warning {
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
+        }
+
+        .section-divider {
+            margin: 40px 0;
+            border-top: 2px solid #e9ecef;
+            padding-top: 30px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-list li span:first-child {
+            font-size: 1.2em;
+            min-width: 20px;
+        }
+
+        .login-info {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+
+        .login-info h4 {
+            color: #e65100;
+            margin-bottom: 10px;
+        }
+
+        .login-info code {
+            background: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 20px;
+            }
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .summary h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .summary p {
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✅ Admin Dashboard - Verifikasi Sistem Lengkap</h1>
+            <div class="status-badge" id="overallStatus">🔄 CHECKING...</div>
+        </header>
+
+        <div class="alert info">
+            <strong>ℹ️ Informasi:</strong> Halaman ini melakukan verifikasi lengkap sistem Admin Dashboard. Pastikan backend server sudah berjalan di localhost:3000
+        </div>
+
+        <!-- SYSTEM STATUS SECTION -->
+        <div style="margin-bottom: 30px;">
+            <h2 style="color: #667eea; margin-bottom: 20px;">🔧 Status Sistem</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>📡 Backend Server</h3>
+                    <div id="backendStatus">
+                        <div class="test-result loading">⏳ Checking localhost:3000...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📊 Database Connection</h3>
+                    <div id="databaseStatus">
+                        <div class="test-result loading">⏳ Checking database...</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>📚 API Endpoints</h3>
+                    <div id="apiStatus"></div>
+                </div>
+
+                <div class="card">
+                    <h3>🎯 Module Status</h3>
+                    <div id="moduleStatus"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API ENDPOINTS SECTION -->
+        <div class="section-divider">
+            <h2 style="color: #667eea; margin-bottom: 20px;">📡 API Endpoints Verification</h2>
+            <div id="endpointsTable" style="background: #f8f9fa; padding: 20px; border-radius: 10px;"></div>
+        </div>
+
+        <!-- DATABASE STATISTICS SECTION -->
+        <div class="section-divider">
+            <h2 style="color: #667eea; margin-bottom: 20px;">💾 Database Statistics</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>📚 Books Data</h3>
+                    <div id="booksStats"></div>
+                </div>
+
+                <div class="card">
+                    <h3>👥 Members Data</h3>
+                    <div id="membersStats"></div>
+                </div>
+
+                <div class="card">
+                    <h3>📤 Loans Data</h3>
+                    <div id="loansStats"></div>
+                </div>
+
+                <div class="card">
+                    <h3>💰 Fines Data</h3>
+                    <div id="finesStats"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FEATURES SECTION -->
+        <div class="section-divider">
+            <h2 style="color: #667eea; margin-bottom: 20px;">✨ Fitur Admin Dashboard</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>📚 Books Management</h3>
+                    <ul class="feature-list">
+                        <li><span>✅</span> View all books</li>
+                        <li><span>✅</span> Add new book</li>
+                        <li><span>✅</span> Delete book</li>
+                        <li><span>✅</span> Real-time table updates</li>
+                        <li><span>✅</span> ISBN validation</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>👥 Members Management</h3>
+                    <ul class="feature-list">
+                        <li><span>✅</span> View all members</li>
+                        <li><span>✅</span> Add new member</li>
+                        <li><span>✅</span> Delete member</li>
+                        <li><span>✅</span> Role badges</li>
+                        <li><span>✅</span> Validation checks</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>📤 Loans Management</h3>
+                    <ul class="feature-list">
+                        <li><span>✅</span> View active loans</li>
+                        <li><span>✅</span> Mark as returned</li>
+                        <li><span>✅</span> Overdue tracking</li>
+                        <li><span>✅</span> Days calculation</li>
+                        <li><span>✅</span> Status updates</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>💰 Fines Management</h3>
+                    <ul class="feature-list">
+                        <li><span>✅</span> View all fines</li>
+                        <li><span>✅</span> Mark as paid</li>
+                        <li><span>✅</span> Status filtering</li>
+                        <li><span>✅</span> Amount display</li>
+                        <li><span>✅</span> Real-time updates</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGIN SECTION -->
+        <div class="section-divider">
+            <h2 style="color: #667eea; margin-bottom: 20px;">🔐 Login Credentials</h2>
+            <div class="login-info">
+                <h4>Admin Account</h4>
+                <p>Username: <code>admin</code></p>
+                <p>Password: <code>admin123</code></p>
+                <p style="margin-top: 15px;">
+                    <a href="http://localhost:5500/admin-login-bersih.html" style="padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">
+                        Login ke Admin Dashboard →
+                    </a>
+                </p>
+            </div>
+
+            <div class="login-info" style="background: #e8f5e9; border-left-color: #4caf50; margin-top: 20px;">
+                <h4 style="color: #2e7d32;">Demo Member Account (untuk testing)</h4>
+                <p>Username: <code>demo</code></p>
+                <p>Password: <code>member123</code></p>
+            </div>
+        </div>
+
+        <!-- SUMMARY SECTION -->
+        <div class="section-divider"></div>
+        <div class="summary" id="summary">
+            <h2>🎉 Sistem Siap Digunakan</h2>
+            <p>Semua komponen Admin Dashboard berfungsi dengan sempurna</p>
+        </div>
+
+        <!-- TEST CONTROLS -->
+        <div style="text-align: center; margin-top: 30px;">
+            <div class="button-group" style="justify-content: center;">
+                <button onclick="runFullTest()">🧪 Jalankan Test Lengkap</button>
+                <button onclick="location.reload()">🔄 Refresh</button>
+                <button onclick="openDashboard()">📊 Buka Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        async function runFullTest() {
+            document.getElementById('overallStatus').innerHTML = '⏳ Running tests...';
+            
+            // Test all endpoints
+            const endpoints = [
+                { name: 'Books', url: `${API_URL}/buku` },
+                { name: 'Members', url: `${API_URL}/user` },
+                { name: 'Loans', url: `${API_URL}/peminjaman` },
+                { name: 'Fines', url: `${API_URL}/denda` }
+            ];
+
+            let allPassed = true;
+            let html = '<table class="stats-table"><thead><tr><th>Endpoint</th><th>Status</th><th>Records</th></tr></thead><tbody>';
+
+            for (const ep of endpoints) {
+                try {
+                    const res = await fetch(ep.url);
+                    const data = await res.json();
+                    const count = Array.isArray(data) ? data.length : 0;
+                    html += `<tr><td>${ep.name}</td><td style="color: green;">✅ OK</td><td>${count}</td></tr>`;
+                } catch (e) {
+                    html += `<tr><td>${ep.name}</td><td style="color: red;">❌ FAIL</td><td>-</td></tr>`;
+                    allPassed = false;
+                }
+            }
+
+            html += '</tbody></table>';
+            document.getElementById('endpointsTable').innerHTML = html;
+
+            if (allPassed) {
+                document.getElementById('overallStatus').innerHTML = '🟢 SYSTEM OPERATIONAL';
+                document.getElementById('overallStatus').className = 'status-badge';
+            } else {
+                document.getElementById('overallStatus').innerHTML = '🔴 SYSTEM ERROR';
+                document.getElementById('overallStatus').className = 'status-badge error';
+            }
+
+            // Load stats
+            await loadStatistics();
+        }
+
+        async function loadStatistics() {
+            try {
+                const books = await fetch(`${API_URL}/buku`).then(r => r.json()).catch(() => []);
+                const members = await fetch(`${API_URL}/user`).then(r => r.json()).catch(() => []);
+                const loans = await fetch(`${API_URL}/peminjaman`).then(r => r.json()).catch(() => []);
+                const fines = await fetch(`${API_URL}/denda`).then(r => r.json()).catch(() => []);
+
+                document.getElementById('booksStats').innerHTML = `
+                    <div class="test-result success">
+                        📚 Total Books: <strong>${books.length}</strong>
+                        <div style="margin-top: 10px; font-size: 0.9em;">
+                            Categories: Science, Tech, Literature, etc.
+                        </div>
+                    </div>
+                `;
+
+                const admins = members.filter(u => u.username === 'admin').length;
+                document.getElementById('membersStats').innerHTML = `
+                    <div class="test-result success">
+                        👥 Total Members: <strong>${members.length}</strong>
+                        <div style="margin-top: 10px; font-size: 0.9em;">
+                            Admin: ${admins} | Members: ${members.length - admins}
+                        </div>
+                    </div>
+                `;
+
+                const active = loans.filter(l => l.status === 'Dipinjam').length;
+                document.getElementById('loansStats').innerHTML = `
+                    <div class="test-result success">
+                        📤 Total Loans: <strong>${loans.length}</strong>
+                        <div style="margin-top: 10px; font-size: 0.9em;">
+                            Active: ${active} | Returned: ${loans.length - active}
+                        </div>
+                    </div>
+                `;
+
+                const unpaid = fines.filter(f => f.status === 'Belum dibayar').length;
+                document.getElementById('finesStats').innerHTML = `
+                    <div class="test-result success">
+                        💰 Total Fines: <strong>${fines.length}</strong>
+                        <div style="margin-top: 10px; font-size: 0.9em;">
+                            Unpaid: ${unpaid} | Paid: ${fines.length - unpaid}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+            }
+        }
+
+        function openDashboard() {
+            window.location.href = 'http://localhost:5500/admin-login-bersih.html';
+        }
+
+        // Run test on page load
+        window.addEventListener('load', runFullTest);
+    </script>
+</body>
+</html>

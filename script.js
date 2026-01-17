@@ -82,22 +82,7 @@ function logout(){
 }
 
 // ===== ADMIN AUTHENTICATION =====
-function adminLogin(){
-  const username = document.getElementById('adminUsername').value;
-  const password = document.getElementById('adminPassword').value;
 
-  // Validasi credential admin
-  const adminUser = 'admin';
-  const adminPass = 'admin123';
-
-  if (username === adminUser && password === adminPass) {
-    localStorage.setItem('admin_login', 'true');
-    localStorage.setItem('admin_user', username);
-    location.href = 'admin-dashboard.html';
-  } else {
-    alert('Username atau password admin salah!');
-  }
-}
 
 function checkAdminLogin(){
   if (!localStorage.getItem('admin_login')) {
